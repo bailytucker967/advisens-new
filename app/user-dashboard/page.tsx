@@ -33,7 +33,7 @@ export default function UserDashboardPage() {
     
     async function loadData() {
       try {
-        const userData = await authAPI.getCurrentUser();
+        const userData = await authAPI.getCurrentUser() as { user?: any; advisor?: any };
         if (!mounted) return;
         
         setUser(userData.user || userData.advisor);

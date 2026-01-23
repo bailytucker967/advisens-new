@@ -34,7 +34,7 @@ export default function AdvisorDashboardPage() {
     
     async function loadData() {
       try {
-        const advisorData = await authAPI.getCurrentUser();
+        const advisorData = await authAPI.getCurrentUser() as { advisor?: any; user?: any };
         if (!mounted) return;
         
         setAdvisor(advisorData.advisor || advisorData.user);
