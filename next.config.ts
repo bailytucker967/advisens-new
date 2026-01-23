@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",          // 👈 THIS is the key
+  // Removed static export to enable SSR and API routes
   images: {
-    unoptimized: true,       // 👈 cPanel can’t optimize images
+    unoptimized: true,
   },
-  trailingSlash: true,       // 👈 avoids 404s on refresh
+  trailingSlash: true,
 };
 
 export default nextConfig;

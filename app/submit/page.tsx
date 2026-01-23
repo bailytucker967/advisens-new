@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { apiRequest } from "@/lib/api-client";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -104,6 +105,8 @@ export default function SubmitCasePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<SubmitCaseForm>(DEFAULT_FORM);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmitCase = () => {
     // Already on submit page, do nothing or scroll to top
@@ -158,10 +161,38 @@ export default function SubmitCasePage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
-    alert("Case submitted (demo). Wire this to your backend when ready.");
+    
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await apiRequest('/api/cases/submit', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          basedIn: form.basedIn,
+          timeHorizon: form.timeHorizon,
+          hadAdviceBefore: form.hadAdviceBefore,
+          perspectives: form.perspectives,
+          situation: form.situation,
+          unclear: form.unclear,
+          lookingFor: form.lookingFor,
+          areas: form.areas,
+          consentNotAdvice: form.consentNotAdvice,
+          consentShareAnonymously: form.consentShareAnonymously,
+        }),
+      });
+
+      // Redirect to user dashboard on success
+      router.push('/user-dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit case. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -433,6 +464,11 @@ export default function SubmitCasePage() {
           {/* Step 4 */}
           {step === 4 && (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="max-w-3xl rounded-2xl border border-red-400/40 bg-red-500/10 p-4 text-sm text-red-200">
+                  {error}
+                </div>
+              )}
               <p className="max-w-3xl text-sm md:text-base text-slate-200">
                 Create an account so you can review responses securely, when you choose.
               </p>
@@ -519,10 +555,10 @@ export default function SubmitCasePage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={!canSubmit || loading}
                   className="rounded-full border border-white/90 px-7 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900 disabled:cursor-not-allowed disabled:border-white/40 disabled:text-white/60 disabled:hover:bg-transparent disabled:hover:text-white"
                 >
-                  Submit case
+                  {loading ? "Submitting..." : "Submit case"}
                 </button>
               </div>
             </form>

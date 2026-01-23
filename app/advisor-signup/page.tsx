@@ -5,12 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authAPI } from "@/lib/api-client";
 
-export default function AdvisorLoginPage() {
+export default function AdvisorSignupPage() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
+    name: "",
+    firm: "",
+    bio: "",
   });
 
   const [error, setError] = useState("");
@@ -21,12 +25,30 @@ export default function AdvisorLoginPage() {
     setError("");
     setLoading(true);
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await authAPI.advisorLogin(formData.email, formData.password);
+      await authAPI.advisorSignup(
+        formData.email,
+        formData.password,
+        formData.name || undefined,
+        formData.firm || undefined,
+        formData.bio || undefined
+      );
       // Use window.location for full page reload to ensure cookie is available
       window.location.href = "/advisor-dashboard";
     } catch (err: any) {
-      setError(err.message || "Login failed. Please try again.");
+      setError(err.message || "Signup failed. Please try again.");
       setLoading(false);
     }
   };
@@ -50,19 +72,10 @@ export default function AdvisorLoginPage() {
                 ← Back to home
               </Link>
               <h1 className="text-3xl md:text-4xl font-bold text-white">
-                Advisor Login
+                Advisor Signup
               </h1>
               <p className="leading-relaxed font-medium text-slate-200">
-                Access assigned cases and submit professional responses.
-              </p>
-            </div>
-
-            {/* Advisor Notice */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6">
-              <p className="text-sm leading-relaxed font-medium text-slate-200">
-                Advisor access is restricted. All activity is logged and linked to
-                your verified advisor profile. Client identities remain hidden unless
-                disclosure is explicitly permitted.
+                Create your advisor account to start responding to cases.
               </p>
             </div>
 
@@ -73,12 +86,12 @@ export default function AdvisorLoginPage() {
               </div>
             )}
 
-            {/* Login Form */}
+            {/* Form */}
             <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-3">
                   <label htmlFor="email" className="text-sm font-medium block text-white">
-                    Advisor email
+                    Email address *
                   </label>
                   <input
                     id="email"
@@ -96,12 +109,12 @@ export default function AdvisorLoginPage() {
 
                 <div className="space-y-3">
                   <label htmlFor="password" className="text-sm font-medium block text-white">
-                    Password
+                    Password *
                   </label>
                   <input
                     id="password"
                     type="password"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) =>
@@ -109,6 +122,74 @@ export default function AdvisorLoginPage() {
                     }
                     className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
                     required
+                    minLength={6}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium block text-white">
+                    Confirm Password *
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                    required
+                    minLength={6}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label htmlFor="name" className="text-sm font-medium block text-white">
+                    Name (optional)
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    placeholder="Your name"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label htmlFor="firm" className="text-sm font-medium block text-white">
+                    Firm (optional)
+                  </label>
+                  <input
+                    id="firm"
+                    type="text"
+                    placeholder="Your firm name"
+                    value={formData.firm}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, firm: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label htmlFor="bio" className="text-sm font-medium block text-white">
+                    Bio (optional)
+                  </label>
+                  <textarea
+                    id="bio"
+                    rows={3}
+                    placeholder="Brief description of your expertise"
+                    value={formData.bio}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
                   />
                 </div>
 
@@ -117,24 +198,17 @@ export default function AdvisorLoginPage() {
                   disabled={loading}
                   className="w-full rounded-full bg-white/95 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-black/30 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Logging in..." : "Log In"}
+                  {loading ? "Creating account..." : "Sign Up"}
                 </button>
 
+                {/* Links */}
                 <div className="text-center space-y-3 pt-4">
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                    onClick={() => alert("Advisor password recovery coming soon.")}
-                  >
-                    Forgot password?
-                  </button>
-
                   <div>
                     <Link
-                      href="/advisor-signup"
+                      href="/advisor-login"
                       className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
                     >
-                      Don't have an account? Sign up
+                      Already have an account? Log in
                     </Link>
                   </div>
                   <div>
@@ -154,5 +228,4 @@ export default function AdvisorLoginPage() {
     </div>
   );
 }
-
 

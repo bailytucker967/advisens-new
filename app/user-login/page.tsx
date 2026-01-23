@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { authAPI } from "@/lib/api-client";
 
 export default function UserLoginPage() {
   const router = useRouter();
@@ -12,10 +13,39 @@ export default function UserLoginPage() {
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Demo flow (kept): wire real auth later.
-    router.push("/user-dashboard");
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    
+    if (loading) {
+      e.preventDefault();
+      return false;
+    }
+    
+    setError("");
+    
+    if (!formData.email || !formData.password) {
+      setError("Please enter both email and password");
+      return false;
+    }
+    
+    setLoading(true);
+
+    try {
+      await authAPI.userLogin(formData.email, formData.password);
+      
+      // Success - redirect immediately (cookie is set in response)
+      window.location.href = "/user-dashboard";
+      return false; // Prevent any form submission
+    } catch (err: any) {
+      setError(err.message || "Invalid email or password");
+      setLoading(false);
+      return false;
+    }
   };
 
   return (
@@ -53,9 +83,20 @@ export default function UserLoginPage() {
               </p>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="bg-red-500/20 backdrop-blur-md rounded-2xl border border-red-400/40 p-4">
+                <p className="text-sm text-red-200">{error}</p>
+              </div>
+            )}
+
             {/* Form */}
             <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                onSubmit={handleSubmit} 
+                className="space-y-6" 
+                noValidate
+              >
                 <div className="space-y-3">
                   <label htmlFor="email" className="text-sm font-medium block text-white">
                     Email address
@@ -71,6 +112,7 @@ export default function UserLoginPage() {
                     }
                     className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
                     required
+                    suppressHydrationWarning
                   />
                 </div>
 
@@ -89,14 +131,17 @@ export default function UserLoginPage() {
                     }
                     className="w-full rounded-lg border border-white/20 bg-white/95 backdrop-blur-sm px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
                     required
+                    suppressHydrationWarning
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-white/95 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-black/30 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-xl cursor-pointer"
+                  disabled={loading || !formData.email || !formData.password}
+                  className="w-full rounded-full bg-white/95 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-black/30 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  suppressHydrationWarning
                 >
-                  Log In
+                  {loading ? "Logging in..." : "Log In"}
                 </button>
 
                 {/* Links */}
@@ -104,9 +149,11 @@ export default function UserLoginPage() {
                   <button
                     type="button"
                     className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       alert("Forgot password flow coming soon.");
                     }}
+                    suppressHydrationWarning
                   >
                     Forgot password?
                   </button>
