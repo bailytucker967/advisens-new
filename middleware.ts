@@ -18,6 +18,7 @@ export function middleware(request: NextRequest) {
     '/user-login',
     '/advisor-login',
     '/advisor-signup',
+    '/advisor-application',
     '/how-it-works',
     '/principles',
     '/before-you-begin',

@@ -29,7 +29,7 @@ export default function UserLoginPage() {
     setError("");
     
     if (!formData.email || !formData.password) {
-      setError("Please enter both email and password");
+      setError("Please enters both email and password");
       return false;
     }
     
