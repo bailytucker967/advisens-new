@@ -54,14 +54,16 @@ export async function POST(
       return NextResponse.json({ error: 'Advisor not found' }, { status: 404 });
     }
 
-    caseDoc.responses = caseDoc.responses || [];
-    caseDoc.responses.push({
-      advisorId: advisor._id,
-      advisorName: advisor.name,
-      advisorFirm: advisor.firm,
-      response: trimmed,
-      profileRevealed: false,
-    });
+caseDoc.responses = caseDoc.responses || [];
+caseDoc.responses.push({
+  advisorId: advisor._id,
+  advisorName: advisor.name,
+  advisorFirm: advisor.firm,
+  response: trimmed,
+  submittedAt: new Date(), // 👈 ADD THIS
+  profileRevealed: false,
+});
+
 
     // Update status if first response
     if (caseDoc.responses.length === 1) {
