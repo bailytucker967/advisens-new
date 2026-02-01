@@ -121,7 +121,13 @@ export default function UserDashboardPage() {
                 Track your submitted cases and review advisor responses.
               </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/user-dashboard/profile"
+                className="rounded-full border border-white/40 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/10"
+              >
+                Profile
+              </Link>
               <Link
                 href="/submit"
                 className="rounded-full border border-white/80 bg-white/10 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900"

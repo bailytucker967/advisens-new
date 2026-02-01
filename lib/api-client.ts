@@ -47,6 +47,12 @@ export const authAPI = {
       body: JSON.stringify({ email, password, name, firm, bio }),
     }),
 
+  adminLogin: (email: string, password: string) =>
+    apiRequest('/api/auth/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
   logout: () =>
     apiRequest('/api/auth/logout', {
       method: 'POST',

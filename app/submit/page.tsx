@@ -470,7 +470,8 @@ export default function SubmitCasePage() {
                 </div>
               )}
               <p className="max-w-3xl text-sm md:text-base text-slate-200">
-                Create an account so you can review responses securely, when you choose.
+                Enter your email and password below. When you submit, a user account will be created automatically
+                so you can view responses. If you already have an account, use the same credentials to log in.
               </p>
 
               <div className="max-w-3xl rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 text-sm text-emerald-50">
@@ -484,9 +485,9 @@ export default function SubmitCasePage() {
               <div className="rounded-3xl border border-white/10 bg-white/90 p-6 text-slate-900 shadow-xl backdrop-blur-xl md:p-8">
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <div className="text-sm font-semibold text-slate-900">Create your account</div>
+                    <div className="text-sm font-semibold text-slate-900">Email & password</div>
                     <p className="text-xs text-slate-500">
-                      Used only to notify you when responses are ready. No outreach, no sharing.
+                      A user account is created by default when you submit. Used only to access your case and view responses.
                     </p>
                   </div>
 

@@ -159,6 +159,13 @@ export default function Footer() {
                     <span className="block text-xs text-slate-400 mt-0.5">For regulated advisors applying to join Advisens.</span>
                   </span>
                 </Link>
+                <Link href="/admin-login" className="group/item flex items-center gap-2.5 text-sm text-slate-300 transition-all duration-200 hover:text-white hover:translate-x-1">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-linear-to-br from-blue-500 to-cyan-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
+                    <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-blue-500 to-cyan-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
+                  </div>
+                  Admin login
+                </Link>
               </div>
             </div>
           </div>

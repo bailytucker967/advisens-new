@@ -19,6 +19,12 @@ export interface ICase extends Document {
   
   // Status
   status: 'submitted' | 'responded' | 'profile_revealed' | 'closed';
+
+  // When advisor reveals user profile (user gets notified)
+  userRevealedTo: Array<{
+    advisorId: Types.ObjectId;
+    revealedAt: Date;
+  }>;
   
   // Responses
   responses: Array<{
@@ -69,6 +75,12 @@ const CaseSchema = new Schema<ICase>(
       enum: ['submitted', 'responded', 'profile_revealed', 'closed'],
       default: 'submitted',
     },
+    userRevealedTo: [
+      {
+        advisorId: { type: Schema.Types.ObjectId, ref: 'Advisor', required: true },
+        revealedAt: { type: Date, default: Date.now },
+      },
+    ],
     responses: [
       {
         advisorId: {

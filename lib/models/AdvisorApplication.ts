@@ -5,6 +5,7 @@ export interface IAdvisorApplication extends Document {
   firstName: string;
   lastName: string;
   professionalEmail: string;
+  password: string;
   mobile: string;
   linkedInUrl?: string;
   location: {
@@ -70,6 +71,12 @@ const AdvisorApplicationSchema = new Schema<IAdvisorApplication>(
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
     },
     mobile: { type: String, required: true, trim: true },
     linkedInUrl: { type: String, trim: true },
