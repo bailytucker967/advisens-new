@@ -8,11 +8,19 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    if (!body.password || body.password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters' },
+        { status: 400 }
+      );
+    }
+
     // Create new application
     const application = new AdvisorApplication({
       firstName: body.firstName,
       lastName: body.lastName,
       professionalEmail: body.professionalEmail.toLowerCase(),
+      password: body.password,
       mobile: body.mobile,
       linkedInUrl: body.linkedInUrl,
       location: {
@@ -37,6 +45,7 @@ export async function POST(request: NextRequest) {
       areasOfAdvice: body.areasOfAdvice || [],
       typicalClientProfile: body.typicalClientProfile,
       qualifications: body.qualifications,
+      supportingDocuments: body.supportingDocuments || [],
       acknowledgesNoCommissions: body.acknowledgesNoCommissions,
       acknowledgesNoContact: body.acknowledgesNoContact,
       acknowledgesHonestResponse: body.acknowledgesHonestResponse,

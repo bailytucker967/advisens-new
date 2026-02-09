@@ -47,7 +47,7 @@ export default function Footer() {
       {/* Bottom gradient fade - bluish black */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-slate-900/15 via-transparent to-transparent pointer-events-none"></div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-8 min-w-0">
         <div className="grid gap-4 md:grid-cols-[2fr,1fr,1fr] md:gap-6 mb-6">
           {/* Brand Section */}
           <div className="space-y-2">

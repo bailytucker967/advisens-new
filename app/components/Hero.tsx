@@ -8,12 +8,12 @@ interface HeroProps {
 
 export default function Hero({ onSubmitCase }: HeroProps) {
   return (
-    <section className="relative isolate overflow-hidden min-h-screen">
+    <section className="relative isolate overflow-hidden min-h-screen overflow-x-clip">
       <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-col gap-12 px-4 pt-8 pb-20 md:flex-row md:items-center md:gap-16 md:px-6 md:pt-12 lg:pb-24">
         {/* Left: Text */}
         <div className="flex-1 space-y-6 text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Decision prep for GCC investors
+            Decision preparation platform for expats
           </p>
           <h1 className="max-w-xl text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
             Compare approaches
@@ -47,20 +47,20 @@ export default function Hero({ onSubmitCase }: HeroProps) {
           </div>
         </div>
 
-        {/* Right: Visual element */}
-        <div className="relative flex-1">
-          {/* Ambient blobs */}
-          <div className="pointer-events-none absolute -inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.22),transparent_55%)]" />
-          <div className="pointer-events-none absolute -right-10 top-6 -z-20 h-40 w-40 rounded-full bg-emerald-400/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-12 bottom-6 -z-20 h-48 w-48 rounded-full bg-lime-300/20 blur-3xl" />
+        {/* Right: Visual element - effects visible on mobile too */}
+        <div className="relative flex-1 min-h-[280px] sm:min-h-0">
+          {/* Ambient blobs - visible on all screen sizes */}
+          <div className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.22),transparent_55%)]" />
+          <div className="pointer-events-none absolute -right-6 top-4 sm:-right-10 sm:top-6 -z-20 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-emerald-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-6 bottom-4 sm:-left-12 sm:bottom-6 -z-20 h-32 w-32 sm:h-48 sm:w-48 rounded-full bg-lime-300/20 blur-3xl" />
 
-          <div className="relative mx-auto max-w-md">
-            {/* Card stack behind */}
-            <div className="pointer-events-none absolute left-6 top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/25 bg-white/10 backdrop-blur-sm" />
-            <div className="pointer-events-none absolute right-4 top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/20 bg-white/10 backdrop-blur-sm" />
+          <div className="relative mx-auto max-w-md w-full px-2 sm:px-0">
+            {/* Card stack behind - visible on mobile */}
+            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/25 bg-white/10 backdrop-blur-sm" />
+            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/20 bg-white/10 backdrop-blur-sm" />
 
-            {/* Main "product preview" */}
-            <div className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-5 shadow-2xl shadow-black/30 backdrop-blur-md animate-[floaty_7s_ease-in-out_infinite]">
+            {/* Main "product preview" - floaty animation works on mobile */}
+            <div className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-md animate-[floaty_7s_ease-in-out_infinite]">
               {/* Animated gradient edge */}
               <div className="pointer-events-none absolute -inset-[2px] -z-10 rounded-[26px] bg-linear-to-br from-emerald-400/60 via-white/30 to-lime-300/60 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
               {/* Shimmer sweep */}

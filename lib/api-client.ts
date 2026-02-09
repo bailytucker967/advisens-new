@@ -11,6 +11,7 @@ export async function apiRequest<T>(
       ...options.headers,
     },
     credentials: 'include',
+    cache: 'no-store', // prevent stale data after profile/case updates
   });
 
   const data = await response.json();
@@ -45,6 +46,12 @@ export const authAPI = {
     apiRequest('/api/auth/advisor/signup', {
       method: 'POST',
       body: JSON.stringify({ email, password, name, firm, bio }),
+    }),
+
+  adminLogin: (email: string, password: string) =>
+    apiRequest('/api/auth/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
     }),
 
   logout: () =>

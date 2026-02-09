@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
     '/submit',
     '/user-login',
     '/advisor-login',
-    '/advisor-signup',
+    '/admin-login',
     '/advisor-application',
     '/how-it-works',
     '/principles',

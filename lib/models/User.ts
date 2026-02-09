@@ -5,6 +5,23 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: 'user';
+  /** Profile overview - editable by user, some auto-filled from case submissions */
+  profile?: {
+    basedIn?: string;
+    timeHorizon?: string;
+    hadAdviceBefore?: string;
+    perspectives?: string[];
+    situation?: string;
+    unclear?: string;
+    lookingFor?: string;
+    areas?: string[];
+    /** Editable: Region (e.g. GCC) */
+    region?: string;
+    /** Editable: Residency outlook (short_term, medium_term, long_term, unsure) */
+    residencyOutlook?: string;
+    /** Editable: What matters in an advisor relationship */
+    advisorPreferences?: string[];
+  };
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -30,6 +47,19 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ['user'],
       default: 'user',
+    },
+    profile: {
+      basedIn: String,
+      timeHorizon: String,
+      hadAdviceBefore: String,
+      perspectives: [String],
+      situation: String,
+      unclear: String,
+      lookingFor: String,
+      areas: [String],
+      region: String,
+      residencyOutlook: String,
+      advisorPreferences: [String],
     },
   },
   {

@@ -19,13 +19,28 @@ export interface ICase extends Document {
   
   // Status
   status: 'submitted' | 'responded' | 'profile_revealed' | 'closed';
+
+  // When advisor reveals user profile (user gets notified)
+  userRevealedTo: Array<{
+    advisorId: Types.ObjectId;
+    revealedAt: Date;
+  }>;
   
   // Responses
   responses: Array<{
     advisorId: Types.ObjectId;
     advisorName?: string;
     advisorFirm?: string;
-    response: string;
+    /** Legacy: single text response. Used when responseSections is not set. */
+    response?: string;
+    /** Structured response sections for richer advisor responses */
+    responseSections?: {
+      approach?: string;
+      clarifyBeforeAdvice?: string;
+      howDecisionsMade?: string;
+      feePhilosophy?: string;
+      whoThisSuits?: string;
+    };
     submittedAt: Date;
     profileRevealed: boolean;
     profileRevealedAt?: Date;
@@ -69,6 +84,12 @@ const CaseSchema = new Schema<ICase>(
       enum: ['submitted', 'responded', 'profile_revealed', 'closed'],
       default: 'submitted',
     },
+    userRevealedTo: [
+      {
+        advisorId: { type: Schema.Types.ObjectId, ref: 'Advisor', required: true },
+        revealedAt: { type: Date, default: Date.now },
+      },
+    ],
     responses: [
       {
         advisorId: {
@@ -78,9 +99,13 @@ const CaseSchema = new Schema<ICase>(
         },
         advisorName: String,
         advisorFirm: String,
-        response: {
-          type: String,
-          required: true,
+        response: String,
+        responseSections: {
+          approach: String,
+          clarifyBeforeAdvice: String,
+          howDecisionsMade: String,
+          feePhilosophy: String,
+          whoThisSuits: String,
         },
         submittedAt: {
           type: Date,

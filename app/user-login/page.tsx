@@ -59,7 +59,7 @@ export default function UserLoginPage() {
       <div className="fixed inset-0 -z-20 bg-linear-to-b from-black/35 via-black/20 to-black/10" />
 
       <div className="relative z-10">
-        <section className="container mx-auto px-6 py-24 max-w-[1100px]">
+        <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-24 max-w-[1100px]">
           <div className="max-w-md mx-auto space-y-8">
             {/* Header */}
             <div className="text-center space-y-4">
@@ -91,7 +91,7 @@ export default function UserLoginPage() {
             )}
 
             {/* Form */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 sm:p-8">
               <form 
                 onSubmit={handleSubmit} 
                 className="space-y-6" 
