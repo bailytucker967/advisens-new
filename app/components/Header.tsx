@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import Image from "next/image";
 
 interface HeaderProps {
   onNavClick: (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => void;
@@ -11,6 +12,7 @@ interface HeaderProps {
 
 export default function Header({ onNavClick, onSubmitCase }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const handleNavClose = () => setMobileOpen(false);
 
@@ -25,69 +27,91 @@ export default function Header({ onNavClick, onSubmitCase }: HeaderProps) {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const navLinks = [
+    { label: "Home", href: "#home", isAnchor: true, targetId: "home" },
+    { label: "How it works", href: "/how-it-works" },
+    { label: "Principles", href: "/principles" },
+    { label: "Before you begin", href: "/before-you-begin" },
+    { label: "For advisors", href: "/for-advisors" },
+  ];
+
   return (
-    <header className="relative z-50 pt-6 pb-4 px-4 md:px-6">
-      <nav className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-2xl border border-white/10 bg-linear-to-r from-black/20 via-black/30 to-black/20 px-3 py-3 sm:px-4 md:px-8 shadow-xl shadow-black/20 backdrop-blur-lg min-w-0">
-        {/* Subtle dot pattern overlay */}
-        <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
-        
+    <header className="relative z-50 pt-5 pb-4 px-4 md:px-6">
+      <nav
+        className={`relative mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-2xl border px-3 py-2.5 sm:px-4 md:px-6 shadow-2xl shadow-black/30 backdrop-blur-xl transition-all duration-300 min-w-0 ${
+          scrolled
+            ? "border-white/15 bg-black/50"
+            : "border-white/8 bg-gradient-to-r from-black/10 via-black/25 to-black/10"
+        }`}
+      >
+        {/* Subtle inner glow top */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
         {/* Logo */}
-        <Link href="/" className="relative z-10 flex items-center gap-2.5 shrink-0 min-w-0">
-          <div className="h-8 w-8 shrink-0 rounded-lg bg-linear-to-br from-emerald-500 via-emerald-400 to-lime-400 shadow-md shadow-emerald-200" />
-          <span className="text-base sm:text-lg font-semibold tracking-tight text-white truncate">
+        <Link href="/" className="relative z-10 flex items-center gap-2.5 shrink-0 min-w-0 group">
+          <div className="relative h-9 w-9 shrink-0 rounded-xl overflow-hidden shadow-lg shadow-emerald-900/40 ring-1 ring-white/10 transition-all duration-200 group-hover:ring-emerald-400/40 group-hover:shadow-emerald-600/30">
+            <Image
+              src="/advisenslogo.jpeg"
+              alt="Advisens logo"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          <span className="text-base sm:text-lg font-semibold tracking-tight text-white truncate transition-colors group-hover:text-emerald-300">
             Advisens
           </span>
         </Link>
 
         {/* Desktop: Centered Navigation Links */}
-        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 text-sm text-white/90 md:flex">
-          <a 
-            href="#home" 
-            onClick={(e) => onNavClick(e, 'home')}
-            className="rounded-lg px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white"
-          >
-            Home
-          </a>
-          <span className="h-1 w-1 rounded-full bg-white/40" />
-          <Link 
-            href="/how-it-works"
-            className="rounded-lg px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white"
-          >
-            How it works
-          </Link>
-          <span className="h-1 w-1 rounded-full bg-white/40" />
-          <Link 
-            href="/principles"
-            className="rounded-lg px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white"
-          >
-            Principles
-          </Link>
-          <span className="h-1 w-1 rounded-full bg-white/40" />
-          <Link 
-            href="/before-you-begin"
-            className="rounded-lg px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white"
-          >
-            Before you begin
-          </Link>
-          <span className="h-1 w-1 rounded-full bg-white/40" />
-          <Link 
-            href="/for-advisors"
-            className="rounded-lg px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white"
-          >
-            For advisors
-          </Link>
+        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 text-sm text-white/80 md:flex">
+          {navLinks.map((link, i) => (
+            <React.Fragment key={link.label}>
+              {i > 0 && (
+                <span className="h-1 w-1 rounded-full bg-white/25 mx-1" />
+              )}
+              {link.isAnchor ? (
+                <a
+                  href={link.href}
+                  onClick={(e) => onNavClick(e, link.targetId!)}
+                  className="relative rounded-lg px-3 py-1.5 font-medium transition-all duration-150 hover:text-white hover:bg-white/10 active:bg-white/15"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  href={link.href}
+                  className="relative rounded-lg px-3 py-1.5 font-medium transition-all duration-150 hover:text-white hover:bg-white/10 active:bg-white/15"
+                >
+                  {link.label}
+                </Link>
+              )}
+            </React.Fragment>
+          ))}
         </div>
 
-        {/* Desktop CTA + Mobile: Hamburger and CTA */}
-        <div className="relative z-10 flex items-center gap-2">
-          <button 
+        {/* Desktop CTA + Mobile hamburger */}
+        <div className="relative z-10 flex items-center gap-2.5">
+          <button
             onClick={onSubmitCase}
-            className="rounded-lg bg-white/95 px-3 py-2 sm:px-4 md:px-5 text-xs sm:text-sm font-semibold text-slate-900 shadow-md shadow-black/30 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-lg cursor-pointer shrink-0"
+            className="group relative rounded-xl overflow-hidden px-4 py-2 sm:px-5 text-xs sm:text-sm font-semibold text-slate-900 shadow-md shadow-black/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-900/20 cursor-pointer shrink-0"
+            style={{
+              background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #d1fae5 100%)",
+            }}
           >
-            Submit a Case
+            <span className="relative z-10">Submit a Case</span>
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              style={{ background: "linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #a7f3d0 100%)" }}
+            />
           </button>
 
-          {/* Mobile menu toggle - professional hamburger / close */}
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 transition-colors"
@@ -100,85 +124,84 @@ export default function Header({ onNavClick, onSubmitCase }: HeaderProps) {
           </button>
         </div>
 
-        {/* Mobile menu - full-screen overlay, rendered via portal so it sits above all content */}
+        {/* Mobile full-screen overlay */}
         {mobileOpen && typeof document !== "undefined" && createPortal(
           <div
-            className="fixed inset-0 z-[9999] md:hidden flex flex-col animate-[mobile-menu-backdrop_0.2s_ease-out_forwards]"
+            className="fixed inset-0 z-[9999] md:hidden flex flex-col"
             role="dialog"
             aria-label="Navigation menu"
-            style={{ 
-              backgroundColor: "rgba(15, 23, 42, 0.98)", 
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)"
+            style={{
+              backgroundColor: "rgba(10, 18, 35, 0.98)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
             }}
           >
-            {/* Header: Logo left, Close (X) right */}
-            <div className="flex items-center justify-between px-4 py-5 border-b border-white/10">
+            {/* Top gradient accent */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-5 border-b border-white/8">
               <Link href="/" onClick={handleNavClose} className="flex items-center gap-2.5">
-                <div className="h-8 w-8 shrink-0 rounded-lg bg-linear-to-br from-emerald-500 via-emerald-400 to-lime-400 shadow-md shadow-emerald-200/30" />
+                <div className="relative h-9 w-9 shrink-0 rounded-xl overflow-hidden ring-1 ring-white/10">
+                  <Image
+                    src="/advisenslogo.jpeg"
+                    alt="Advisens logo"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
                 <span className="text-lg font-semibold tracking-tight text-white">Advisens</span>
               </Link>
               <button
                 onClick={handleNavClose}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/5 text-white/90 hover:bg-white/10 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
                 aria-label="Close menu"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            {/* Main nav: prominent stacked links */}
+            {/* Nav links */}
             <nav className="flex-1 flex flex-col justify-center px-6 py-8">
-              <div className="flex flex-col gap-1">
-                <a 
-                  href="#home" 
-                  onClick={(e) => { onNavClick(e, 'home'); handleNavClose(); }}
-                  className="block py-4 text-xl font-semibold text-white hover:text-emerald-400 transition-colors border-b border-white/5"
-                >
-                  Home
-                </a>
-                <Link 
-                  href="/how-it-works"
-                  onClick={handleNavClose}
-                  className="block py-4 text-xl font-semibold text-white hover:text-emerald-400 transition-colors border-b border-white/5"
-                >
-                  How it works
-                </Link>
-                <Link 
-                  href="/principles"
-                  onClick={handleNavClose}
-                  className="block py-4 text-xl font-semibold text-white hover:text-emerald-400 transition-colors border-b border-white/5"
-                >
-                  Principles
-                </Link>
-                <Link 
-                  href="/before-you-begin"
-                  onClick={handleNavClose}
-                  className="block py-4 text-xl font-semibold text-white hover:text-emerald-400 transition-colors border-b border-white/5"
-                >
-                  Before you begin
-                </Link>
-                <Link 
-                  href="/for-advisors"
-                  onClick={handleNavClose}
-                  className="block py-4 text-xl font-semibold text-white hover:text-emerald-400 transition-colors border-b border-white/5"
-                >
-                  For advisors
-                </Link>
+              <div className="flex flex-col">
+                {navLinks.map((link) => (
+                  link.isAnchor ? (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      onClick={(e) => { onNavClick(e, link.targetId!); handleNavClose(); }}
+                      className="flex items-center justify-between py-4 text-xl font-semibold text-white/80 hover:text-white transition-colors border-b border-white/6 group"
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-white/20 group-hover:text-emerald-400 transition-colors text-lg">→</span>
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={handleNavClose}
+                      className="flex items-center justify-between py-4 text-xl font-semibold text-white/80 hover:text-white transition-colors border-b border-white/6 group"
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-white/20 group-hover:text-emerald-400 transition-colors text-lg">→</span>
+                    </Link>
+                  )
+                ))}
               </div>
             </nav>
 
-            {/* Separator */}
-            <div className="h-px bg-linear-to-r from-transparent via-white/20 to-transparent mx-4" />
-
-            {/* Bottom: CTA */}
-            <div className="px-6 py-6">
-              <button 
+            {/* Bottom CTA */}
+            <div className="px-6 pb-8 pt-4">
+              <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent mb-6" />
+              <button
                 onClick={() => { onSubmitCase(); handleNavClose(); }}
-                className="w-full rounded-full bg-white/95 px-6 py-4 text-base font-semibold text-slate-900 shadow-lg hover:bg-white transition-colors flex items-center justify-center gap-2"
+                className="w-full rounded-2xl py-4 text-base font-semibold text-slate-900 shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #ffffff 0%, #d1fae5 100%)" }}
               >
                 <span>Submit a Case</span>
-                <span className="text-emerald-600">→</span>
+                <span className="text-emerald-600 text-lg">→</span>
               </button>
             </div>
           </div>,
@@ -188,5 +211,3 @@ export default function Header({ onNavClick, onSubmitCase }: HeaderProps) {
     </header>
   );
 }
-
-
