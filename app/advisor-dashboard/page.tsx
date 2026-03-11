@@ -34,10 +34,15 @@ export default function AdvisorDashboardPage() {
     
     async function loadData() {
       try {
-        const advisorData = await authAPI.getCurrentUser() as { advisor?: any; user?: any };
+        const advisorData = await authAPI.getCurrentUser() as { advisor?: any };
         if (!mounted) return;
         
-        setAdvisor(advisorData.advisor || advisorData.user);
+        if (!advisorData.advisor) {
+          router.push("/advisor-login");
+          return;
+        }
+
+        setAdvisor(advisorData.advisor);
 
         const casesData = await apiRequest<{ cases: Case[] }>('/api/cases/advisor');
         if (!mounted) return;
@@ -45,10 +50,8 @@ export default function AdvisorDashboardPage() {
         setCases(casesData.cases);
       } catch (error) {
         if (!mounted) return;
-        // Temporarily disabled redirect to test
-        // router.push('/advisor-login');
         console.error('Dashboard load error:', error);
-        setLoading(false);
+        router.push("/advisor-login");
       } finally {
         if (mounted) {
           setLoading(false);
@@ -110,7 +113,7 @@ export default function AdvisorDashboardPage() {
         <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="mb-8">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
                   Available cases
@@ -132,22 +135,16 @@ export default function AdvisorDashboardPage() {
 
             <div className="flex gap-4 text-sm">
               <Link
-                href="#"
+                href="/advisor-dashboard/profile"
                 className="text-slate-300 hover:text-white transition-colors"
               >
-                View example response structure →
-              </Link>
-              <Link
-                href="#"
-                className="text-slate-300 hover:text-white transition-colors"
-              >
-                Preview your profile →
+                View & edit your profile →
               </Link>
             </div>
           </div>
 
           {/* Filter Tabs */}
-          <div className="mb-6 flex gap-2 border-b border-white/20">
+          <div className="mb-6 flex gap-2 border-b border-white/20 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 text-sm font-medium transition ${
@@ -173,8 +170,8 @@ export default function AdvisorDashboardPage() {
           {/* Cases List */}
           <div className="space-y-6">
             {filteredCases.length === 0 ? (
-              <div className="rounded-3xl border border-white/10 bg-white/90 p-8 text-center text-slate-900 shadow-xl backdrop-blur-xl">
-                <p className="text-slate-600">No cases available.</p>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-8 text-center">
+                <p className="text-slate-300">No cases available.</p>
               </div>
             ) : (
               filteredCases.map((caseItem) => {
@@ -185,58 +182,58 @@ export default function AdvisorDashboardPage() {
                 return (
                   <div
                     key={caseItem._id}
-                    className="rounded-3xl border border-white/10 bg-white/90 p-6 text-slate-900 shadow-xl backdrop-blur-xl md:p-8"
+                    className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 md:p-8"
                   >
                     {profileRevealed && (
-                      <div className="mb-4">
-                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-slate-300 bg-slate-100 text-slate-700">
+                      <div className="mb-4 p-4 rounded-xl border border-amber-400/30 bg-amber-500/10">
+                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-amber-400/50 bg-amber-500/20 text-amber-200">
                           Profile revealed
                         </span>
-                        <p className="mt-2 text-xs text-slate-500">
+                        <p className="mt-2 text-xs text-slate-300">
                           Status update (no action required)
                         </p>
-                        <p className="mt-1 text-sm text-slate-700">
+                        <p className="mt-1 text-sm text-slate-200">
                           Your contact details have been provided to the user. No further platform actions will occur. Do not initiate contact. If the user wishes to proceed, they will contact you directly.
                         </p>
                       </div>
                     )}
 
                     <div className="mb-4 flex flex-wrap items-center gap-3">
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-slate-400">
                         Submitted {formatDate(caseItem.submittedAt)}
                       </span>
                       {responded && (
-                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-slate-300 bg-slate-100 text-slate-700">
+                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-white/20 bg-white/10 text-slate-200">
                           Response submitted
                         </span>
                       )}
                       {profileRevealed && (
-                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-slate-300 bg-slate-100 text-slate-700">
+                        <span className="px-3 py-1 text-xs font-medium rounded-full border border-amber-400/30 bg-amber-500/20 text-amber-200">
                           Profile revealed
                         </span>
                       )}
                       {caseItem.areas?.map((area) => (
                         <span
                           key={area}
-                          className="px-3 py-1 text-xs font-medium rounded-full border border-slate-300 bg-slate-100 text-slate-700"
+                          className="px-3 py-1 text-xs font-medium rounded-full border border-white/20 bg-white/10 text-slate-200"
                         >
                           {area.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                         </span>
                       ))}
                     </div>
 
-                    <h3 className="mb-2 text-lg font-semibold text-slate-900">
+                    <h3 className="mb-2 text-lg font-semibold text-white">
                       {caseItem.caseId}
                     </h3>
 
-                    <p className="mb-4 text-sm text-slate-600 line-clamp-3">
+                    <p className="mb-4 text-sm text-slate-300 line-clamp-3">
                       {caseItem.situation}
                     </p>
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       <Link
                         href={`/advisor-dashboard/case/${caseItem._id}`}
-                        className="rounded-full border border-slate-300 bg-slate-100 px-4 py-2 text-xs font-medium text-slate-900 transition hover:bg-slate-200"
+                        className="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20"
                       >
                         {responded ? 'Review case' : 'Respond to case'}
                       </Link>

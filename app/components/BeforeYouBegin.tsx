@@ -43,7 +43,7 @@ export default function BeforeYouBegin() {
                     <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
                   </div>
                   <span className="transition-colors duration-300 group-hover/item:text-white">
-                    Advisors cannot contact you without your explicit consent.
+                    You choose if and when to share your details with any advisor.
                   </span>
                 </li>
                 

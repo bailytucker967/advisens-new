@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import Advisor from '@/lib/models/Advisor';
+import Admin from '@/lib/models/Admin';
 import { getAuthFromRequest } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -17,6 +18,23 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
+    if (auth.role === 'admin') {
+      const admin = await Admin.findById(auth.userId);
+      if (!admin) {
+        return NextResponse.json(
+          { error: 'Admin not found' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        admin: {
+          id: admin._id.toString(),
+          email: admin.email,
+          role: 'admin',
+        },
+      });
+    }
+
     if (auth.role === 'user') {
       const user = await User.findById(auth.userId);
       if (!user) {
@@ -30,6 +48,7 @@ export async function GET(request: NextRequest) {
           id: user._id.toString(),
           email: user.email,
           role: user.role,
+          profile: user.profile,
         },
       });
     } else if (auth.role === 'advisor') {

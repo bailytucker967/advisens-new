@@ -44,9 +44,9 @@ export default function Home() {
         <Header onNavClick={handleNavClick} onSubmitCase={handleSubmitCase} />
         <Hero onSubmitCase={handleSubmitCase} />
         <HowItWorks />
-        <Principles />
         <BeforeYouBegin />
         <ReadyToBegin onSubmitCase={handleSubmitCase} />
+        <Principles />
       </main>
 
       <Footer />

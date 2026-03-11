@@ -35,12 +35,24 @@ export async function POST(request: NextRequest) {
     // Check if user exists, if not create one
     let user = await User.findOne({ email: email.toLowerCase() });
     
+    const profileData = {
+      basedIn,
+      timeHorizon,
+      hadAdviceBefore,
+      perspectives: perspectives || [],
+      situation,
+      unclear,
+      lookingFor,
+      areas: areas || [],
+    };
+
     if (!user) {
-      // Create new user
+      // Create new user with profile from case
       user = new User({
         email: email.toLowerCase(),
         password,
         role: 'user',
+        profile: profileData,
       });
       await user.save();
     } else {
@@ -54,6 +66,9 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
+      // Update existing user's profile with latest case data
+      user.profile = profileData;
+      await user.save({ validateBeforeSave: false });
     }
 
     // Create case

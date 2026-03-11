@@ -8,6 +8,29 @@ export interface IAdvisor extends Document {
   name?: string;
   firm?: string;
   bio?: string;
+  /** Full profile for trust & due diligence when revealed to users */
+  mobile?: string;
+  linkedInUrl?: string;
+  location?: { country: string; city: string };
+  firmWebsite?: string;
+  firmOverview?: string;
+  roleTitle?: string;
+  primaryClientBase?: string;
+  yearsOfExperience?: string;
+  areasOfAdvice?: string[];
+  typicalClientProfile?: string;
+  qualifications?: string;
+  jurisdictions?: string[];
+  regulatorName?: string;
+  licenseNumber?: string;
+  hasDisciplinaryActions?: boolean;
+  disciplinaryDetails?: string;
+  advisoryApproach?: string;
+  feePhilosophy?: string;
+  tendsToSuit?: string[];
+  mayNotSuit?: string[];
+  professionalBackground?: string;
+  planningFocusAreas?: string[];
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -34,18 +57,31 @@ const AdvisorSchema = new Schema<IAdvisor>(
       enum: ['advisor'],
       default: 'advisor',
     },
-    name: {
-      type: String,
-      trim: true,
-    },
-    firm: {
-      type: String,
-      trim: true,
-    },
-    bio: {
-      type: String,
-      trim: true,
-    },
+    name: { type: String, trim: true },
+    firm: { type: String, trim: true },
+    bio: { type: String, trim: true },
+    mobile: { type: String, trim: true },
+    linkedInUrl: { type: String, trim: true },
+    location: { country: String, city: String },
+    firmWebsite: { type: String, trim: true },
+    firmOverview: { type: String, trim: true },
+    roleTitle: { type: String, trim: true },
+    primaryClientBase: { type: String, trim: true },
+    yearsOfExperience: { type: String, trim: true },
+    areasOfAdvice: [String],
+    typicalClientProfile: { type: String, trim: true },
+    qualifications: { type: String, trim: true },
+    jurisdictions: [String],
+    regulatorName: { type: String, trim: true },
+    licenseNumber: { type: String, trim: true },
+    hasDisciplinaryActions: Boolean,
+    disciplinaryDetails: { type: String, trim: true },
+    advisoryApproach: { type: String, trim: true },
+    feePhilosophy: { type: String, trim: true },
+    tendsToSuit: [String],
+    mayNotSuit: [String],
+    professionalBackground: { type: String, trim: true },
+    planningFocusAreas: [String],
   },
   {
     timestamps: true,

@@ -16,9 +16,10 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Get all cases (advisors can see all submitted cases)
-    // In a real app, you might want to filter by areas of expertise
-    const cases = await Case.find({ status: { $in: ['submitted', 'responded'] } })
+    // Get all cases (advisors can see submitted, responded, and profile_revealed)
+    const cases = await Case.find({
+      status: { $in: ['submitted', 'responded', 'profile_revealed', 'closed'] },
+    })
       .sort({ submittedAt: -1 })
       .lean();
 

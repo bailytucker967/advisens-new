@@ -218,38 +218,54 @@ export default function SubmitCasePage() {
             </h1>
           </div>
 
+          {/* Step progress indicator */}
+          <div className="mb-8 flex items-center gap-2">
+            {([1, 2, 3, 4] as const).map((s) => (
+              <div key={s} className="flex items-center">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition ${
+                  step >= s ? "bg-emerald-500/30 text-emerald-200 border border-emerald-400/50" : "bg-white/5 text-slate-400 border border-white/10"
+                }`}>
+                  {s}
+                </span>
+                {s < 4 && <span className="mx-1 h-px w-4 bg-white/20" />}
+              </div>
+            ))}
+          </div>
+
           {/* Step 1 */}
           {step === 1 && (
-            <div className="space-y-8 text-slate-100">
-              <p className="max-w-3xl text-sm md:text-base text-slate-200">
-                This is a decision-preparation platform. We do not provide financial advice, recommend products,
-                or endorse specific advisors.
-              </p>
+            <div className="space-y-8">
+              <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 md:p-8">
+                <p className="max-w-3xl text-sm md:text-base text-slate-200">
+                  This is a decision-preparation platform. We do not provide financial advice, recommend products,
+                  or endorse specific advisors.
+                </p>
 
-              <section className="space-y-3">
-                <h2 className="text-base font-semibold text-white">How this works</h2>
-                <ul className="space-y-2 text-sm text-slate-200">
-                  <li>You'll be asked a few short questions to help structure your situation.</li>
-                  <li>Qualified advisors respond anonymously with how they would approach it.</li>
-                  <li>You review their thinking before deciding whether to continue.</li>
-                </ul>
-              </section>
+                <section className="mt-6 space-y-3">
+                  <h2 className="text-base font-semibold text-white">How this works</h2>
+                  <ul className="space-y-2 text-sm text-slate-200">
+                    <li>You'll be asked a few short questions to help structure your situation.</li>
+                    <li>Qualified advisors respond anonymously with how they would approach it.</li>
+                    <li>You review their thinking before deciding whether to continue.</li>
+                  </ul>
+                </section>
 
-              <section className="space-y-3">
-                <h2 className="text-base font-semibold text-white">Your control</h2>
-                <ul className="space-y-2 text-sm text-slate-200">
-                  <li>No obligation to proceed with any advisor.</li>
-                  <li>Advisors cannot contact you without your explicit consent.</li>
-                  <li>You can stop at any point in the process.</li>
-                  <li>Your case remains anonymous throughout.</li>
-                </ul>
-              </section>
+                <section className="mt-6 space-y-3">
+                  <h2 className="text-base font-semibold text-white">Your control</h2>
+                  <ul className="space-y-2 text-sm text-slate-200">
+                    <li>No obligation to proceed with any advisor.</li>
+                    <li>Advisors cannot contact you without your explicit consent.</li>
+                    <li>You can stop at any point in the process.</li>
+                    <li>Your case remains anonymous throughout.</li>
+                  </ul>
+                </section>
+              </div>
 
-              <div className="mt-8 flex justify-end">
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="rounded-full border border-white/80 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900"
+                  className="rounded-full bg-white/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-lg transition hover:bg-white hover:-translate-y-0.5"
                 >
                   Continue
                 </button>
@@ -264,22 +280,22 @@ export default function SubmitCasePage() {
                 A few light questions to help frame your situation. All fields are optional.
               </p>
 
-              <div className="rounded-3xl border border-white/10 bg-white/90 p-6 text-slate-900 shadow-xl backdrop-blur-xl md:p-8">
+              <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 md:p-8">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       Where are you currently based?
                     </label>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Optional — helps frame the regulatory environment.
                     </p>
                     <select
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       value={form.basedIn}
                       onChange={(e) => setField("basedIn", e.target.value)}
                     >
                       {BASED_IN_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
+                        <option key={o.value} value={o.value} className="bg-slate-800 text-white">
                           {o.label}
                         </option>
                       ))}
@@ -287,19 +303,19 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       How long do you expect to remain in the region?
                     </label>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Optional — helps frame time horizons, not outcomes.
                     </p>
                     <select
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       value={form.timeHorizon}
                       onChange={(e) => setField("timeHorizon", e.target.value)}
                     >
                       {TIME_HORIZON_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
+                        <option key={o.value} value={o.value} className="bg-slate-800 text-white">
                           {o.label}
                         </option>
                       ))}
@@ -307,16 +323,16 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       Have you received financial advice before?
                     </label>
                     <select
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       value={form.hadAdviceBefore}
                       onChange={(e) => setField("hadAdviceBefore", e.target.value)}
                     >
                       {ADVICE_BEFORE_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
+                        <option key={o.value} value={o.value} className="bg-slate-800 text-white">
                           {o.label}
                         </option>
                       ))}
@@ -325,18 +341,18 @@ export default function SubmitCasePage() {
                 </div>
 
                 <div className="mt-6 space-y-2">
-                  <div className="text-sm font-semibold text-slate-900">
+                  <div className="text-sm font-semibold text-white">
                     Which perspective would you want an advisor to consider?
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     Optional — helps frame the decision context, not personal profiling.
                   </p>
                   <div className="mt-2 grid gap-2 md:grid-cols-2">
                     {PERSPECTIVE_CHECKBOXES.map((opt) => (
-                      <label key={opt.value} className="flex items-start gap-2 text-sm text-slate-700">
+                      <label key={opt.value} className="flex items-start gap-2 text-sm text-slate-200 cursor-pointer hover:text-white transition">
                         <input
                           type="checkbox"
-                          className="mt-1 rounded border-slate-300 text-emerald-600"
+                          className="mt-1 rounded border-white/30 bg-white/5 text-emerald-500 focus:ring-emerald-400/50"
                           checked={form.perspectives.includes(opt.value)}
                           onChange={() => toggleArray("perspectives", opt.value)}
                         />
@@ -351,14 +367,14 @@ export default function SubmitCasePage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-full border border-white/40 px-4 py-2 text-xs font-medium text-slate-100 hover:bg-white/10"
+                  className="rounded-full border border-white/30 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="rounded-full border border-white/80 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900"
+                  className="rounded-full bg-white/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-lg transition hover:bg-white hover:-translate-y-0.5"
                 >
                   Continue
                 </button>
@@ -374,14 +390,14 @@ export default function SubmitCasePage() {
                 identifiers.
               </p>
 
-              <div className="rounded-3xl border border-white/10 bg-white/90 p-6 text-slate-900 shadow-xl backdrop-blur-xl md:p-8">
+              <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 md:p-8">
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       Describe your situation in your own words.
                     </label>
                     <textarea
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       rows={4}
                       value={form.situation}
                       onChange={(e) => setField("situation", e.target.value)}
@@ -390,14 +406,14 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       What feels unclear or unresolved right now?
                     </label>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       There's no right or wrong level of detail.
                     </p>
                     <textarea
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       rows={4}
                       value={form.unclear}
                       onChange={(e) => setField("unclear", e.target.value)}
@@ -405,16 +421,16 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-white">
                       Which best describes what you're looking for right now?
                     </label>
                     <select
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       value={form.lookingFor}
                       onChange={(e) => setField("lookingFor", e.target.value)}
                     >
                       {LOOKING_FOR_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
+                        <option key={o.value} value={o.value} className="bg-slate-800 text-white">
                           {o.label}
                         </option>
                       ))}
@@ -422,15 +438,15 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm font-semibold text-slate-900">
+                    <div className="text-sm font-semibold text-white">
                       Which areas does your situation touch on? (Select all that apply)
                     </div>
                     <div className="mt-2 grid gap-2 md:grid-cols-2">
                       {AREAS_CHECKBOXES.map((opt) => (
-                        <label key={opt.value} className="flex items-start gap-2 text-sm text-slate-700">
+                        <label key={opt.value} className="flex items-start gap-2 text-sm text-slate-200 cursor-pointer hover:text-white transition">
                           <input
                             type="checkbox"
-                            className="mt-1 rounded border-slate-300 text-emerald-600"
+                            className="mt-1 rounded border-white/30 bg-white/5 text-emerald-500 focus:ring-emerald-400/50"
                             checked={form.areas.includes(opt.value)}
                             onChange={() => toggleArray("areas", opt.value)}
                           />
@@ -446,14 +462,14 @@ export default function SubmitCasePage() {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="rounded-full border border-white/40 px-4 py-2 text-xs font-medium text-slate-100 hover:bg-white/10"
+                  className="rounded-full border border-white/30 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep(4)}
-                  className="rounded-full border border-white/80 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900"
+                  className="rounded-full bg-white/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-lg transition hover:bg-white hover:-translate-y-0.5"
                 >
                   Continue
                 </button>
@@ -465,15 +481,16 @@ export default function SubmitCasePage() {
           {step === 4 && (
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="max-w-3xl rounded-2xl border border-red-400/40 bg-red-500/10 p-4 text-sm text-red-200">
+                <div className="max-w-3xl rounded-2xl border border-red-400/40 bg-red-500/20 p-4 text-sm text-red-100">
                   {error}
                 </div>
               )}
               <p className="max-w-3xl text-sm md:text-base text-slate-200">
-                Create an account so you can review responses securely, when you choose.
+                Enter your email and password below. When you submit, a user account will be created automatically
+                so you can view responses. If you already have an account, use the same credentials to log in.
               </p>
 
-              <div className="max-w-3xl rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 text-sm text-emerald-50">
+              <div className="max-w-3xl rounded-2xl border border-emerald-400/30 bg-emerald-500/20 backdrop-blur-sm p-4 text-sm">
                 <div className="font-semibold text-emerald-200">Your case remains anonymous</div>
                 <p className="mt-1 text-emerald-50/90">
                   Advisors only see your case details, not your identity. Your identity can only be revealed by you,
@@ -481,19 +498,19 @@ export default function SubmitCasePage() {
                 </p>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/90 p-6 text-slate-900 shadow-xl backdrop-blur-xl md:p-8">
+              <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 md:p-8">
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <div className="text-sm font-semibold text-slate-900">Create your account</div>
-                    <p className="text-xs text-slate-500">
-                      Used only to notify you when responses are ready. No outreach, no sharing.
+                    <div className="text-sm font-semibold text-white">Email & password</div>
+                    <p className="text-xs text-slate-400">
+                      Used only to access your case and view responses.
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">Email address</label>
+                    <label className="text-sm font-semibold text-white">Email address</label>
                     <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       type="email"
                       value={form.email}
                       onChange={(e) => setField("email", e.target.value)}
@@ -503,10 +520,10 @@ export default function SubmitCasePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">Set a password</label>
-                    <p className="text-xs text-slate-500">For secure access to your case. (6+ characters)</p>
+                    <label className="text-sm font-semibold text-white">Set a password</label>
+                    <p className="text-xs text-slate-400">For secure access to your case. (6+ characters)</p>
                     <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                      className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
                       type="password"
                       value={form.password}
                       onChange={(e) => setField("password", e.target.value)}
@@ -515,11 +532,11 @@ export default function SubmitCasePage() {
                     />
                   </div>
 
-                  <div className="space-y-3 pt-2 text-sm text-slate-800">
-                    <label className="flex items-start gap-2">
+                  <div className="space-y-3 pt-2 text-sm text-slate-200">
+                    <label className="flex items-start gap-2 cursor-pointer hover:text-white transition">
                       <input
                         type="checkbox"
-                        className="mt-1 rounded border-slate-300 text-emerald-600"
+                        className="mt-1 rounded border-white/30 bg-white/5 text-emerald-500 focus:ring-emerald-400/50"
                         checked={form.consentNotAdvice}
                         onChange={(e) => setField("consentNotAdvice", e.target.checked)}
                       />
@@ -529,10 +546,10 @@ export default function SubmitCasePage() {
                       </span>
                     </label>
 
-                    <label className="flex items-start gap-2">
+                    <label className="flex items-start gap-2 cursor-pointer hover:text-white transition">
                       <input
                         type="checkbox"
-                        className="mt-1 rounded border-slate-300 text-emerald-600"
+                        className="mt-1 rounded border-white/30 bg-white/5 text-emerald-500 focus:ring-emerald-400/50"
                         checked={form.consentShareAnonymously}
                         onChange={(e) => setField("consentShareAnonymously", e.target.checked)}
                       />
@@ -549,14 +566,14 @@ export default function SubmitCasePage() {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="rounded-full border border-white/40 px-4 py-2 text-xs font-medium text-slate-100 hover:bg-white/10"
+                  className="rounded-full border border-white/30 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={!canSubmit || loading}
-                  className="rounded-full border border-white/90 px-7 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-slate-900 disabled:cursor-not-allowed disabled:border-white/40 disabled:text-white/60 disabled:hover:bg-transparent disabled:hover:text-white"
+                  className="rounded-full bg-white/95 px-7 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-lg transition hover:bg-white hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                   {loading ? "Submitting..." : "Submit case"}
                 </button>

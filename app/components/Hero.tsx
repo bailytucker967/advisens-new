@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import CaseStats from "./CaseStats";
 
 interface HeroProps {
   onSubmitCase: () => void;
@@ -8,12 +9,12 @@ interface HeroProps {
 
 export default function Hero({ onSubmitCase }: HeroProps) {
   return (
-    <section className="relative isolate overflow-hidden min-h-screen">
+    <section className="relative isolate overflow-hidden min-h-screen overflow-x-clip">
       <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-col gap-12 px-4 pt-8 pb-20 md:flex-row md:items-center md:gap-16 md:px-6 md:pt-12 lg:pb-24">
         {/* Left: Text */}
         <div className="flex-1 space-y-6 text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Decision prep for GCC investors
+            Senior professionals in the GCC managing cross-border finances and long-term planning.
           </p>
           <h1 className="max-w-xl text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
             Compare approaches
@@ -45,22 +46,26 @@ export default function Hero({ onSubmitCase }: HeroProps) {
               See sample cases
             </button>
           </div>
+
+          <div className="pt-1">
+            <CaseStats />
+          </div>
         </div>
 
-        {/* Right: Visual element */}
-        <div className="relative flex-1">
-          {/* Ambient blobs */}
-          <div className="pointer-events-none absolute -inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.22),transparent_55%)]" />
-          <div className="pointer-events-none absolute -right-10 top-6 -z-20 h-40 w-40 rounded-full bg-emerald-400/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-12 bottom-6 -z-20 h-48 w-48 rounded-full bg-lime-300/20 blur-3xl" />
+        {/* Right: Visual element - effects visible on mobile too */}
+        <div className="relative flex-1 min-h-[280px] sm:min-h-0">
+          {/* Ambient blobs - visible on all screen sizes */}
+          <div className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.22),transparent_55%)]" />
+          <div className="pointer-events-none absolute -right-6 top-4 sm:-right-10 sm:top-6 -z-20 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-emerald-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-6 bottom-4 sm:-left-12 sm:bottom-6 -z-20 h-32 w-32 sm:h-48 sm:w-48 rounded-full bg-lime-300/20 blur-3xl" />
 
-          <div className="relative mx-auto max-w-md">
-            {/* Card stack behind */}
-            <div className="pointer-events-none absolute left-6 top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/25 bg-white/10 backdrop-blur-sm" />
-            <div className="pointer-events-none absolute right-4 top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/20 bg-white/10 backdrop-blur-sm" />
+          <div className="relative mx-auto max-w-md w-full px-2 sm:px-0">
+            {/* Card stack behind - visible on mobile */}
+            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/25 bg-white/10 backdrop-blur-sm" />
+            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/20 bg-white/10 backdrop-blur-sm" />
 
-            {/* Main "product preview" */}
-            <div className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-5 shadow-2xl shadow-black/30 backdrop-blur-md animate-[floaty_7s_ease-in-out_infinite]">
+            {/* Main "product preview" - floaty animation works on mobile */}
+            <div className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-md animate-[floaty_7s_ease-in-out_infinite]">
               {/* Animated gradient edge */}
               <div className="pointer-events-none absolute -inset-[2px] -z-10 rounded-[26px] bg-linear-to-br from-emerald-400/60 via-white/30 to-lime-300/60 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
               {/* Shimmer sweep */}
@@ -68,92 +73,111 @@ export default function Hero({ onSubmitCase }: HeroProps) {
                 <div className="absolute -left-1/2 top-0 h-full w-1/2 rotate-12 bg-linear-to-r from-transparent via-white/35 to-transparent animate-[shimmer_6s_ease-in-out_infinite]" />
               </div>
 
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-600">
-                  Anonymous Case
-                </span>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                  You
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0 flex flex-1 flex-col gap-1">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 truncate">
+                    Case 009 · Investments / savings
+                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
+                      Dubai · UAE
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
+                      3–5 year horizon
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
+                      First time taking advice
+                    </span>
+                  </div>
+                </div>
+                <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                  Anonymous
                 </span>
               </div>
 
-              {/* Mini top nav */}
-              <div className="mb-4 flex items-center gap-2">
+              {/* Mini top nav - wraps on narrow screens */}
+              <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-slate-900 px-3 py-1 text-[10px] font-semibold text-white">
-                  Compare
+                  Situation
                 </span>
                 <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold text-slate-700">
-                  Approach
+                  Advisor approach
                 </span>
                 <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold text-slate-700">
                   Fees
                 </span>
-                <span className="ml-auto text-[10px] font-medium text-slate-500">
-                  Updated just now
+                <span className="text-[10px] font-medium text-slate-500 sm:ml-auto">
+                  Preview of a real case
                 </span>
               </div>
 
-              <p className="mb-4 text-sm text-slate-800">
-                &quot;I&apos;m considering working with a financial advisor for long-term
-                planning. How would you approach a case like this for someone
-                based in the GCC?&quot;
+              <p className="mb-3 text-xs leading-relaxed text-slate-700">
+                &quot;I&apos;m a 38-year-old expat in Dubai with savings in cash and a
+                couple of offshore policies from a previous advisor. I want a
+                clearer long‑term plan for retirement and school fees without
+                locking everything away or paying hidden commissions.&quot;
               </p>
 
-              {/* Side-by-side comparison cards */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-100 bg-white/85 p-3">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-700">
+              {/* Side-by-side comparison cards - single column on mobile, two on sm+ */}
+              <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="min-w-0 rounded-2xl border border-slate-100 bg-white/90 p-3">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-1">
+                    <span className="text-xs font-semibold text-slate-800">
                       Advisor A
                     </span>
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex shrink-0 items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-emerald-400" />
                       <span className="text-[10px] font-semibold text-slate-600">
                         Match 92
                       </span>
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600">
-                    Starts with goals + constraints, then builds a plan with
-                    transparent fees.
+                  <p className="text-[11px] leading-relaxed text-slate-700">
+                    Starts with a full cash‑flow picture, then builds a plan
+                    around school fees and retirement in your home country.
+                    Uses low‑cost funds and a flat planning fee — no product
+                    commissions.
                   </p>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full w-[92%] rounded-full bg-linear-to-r from-emerald-400 to-lime-300" />
-                  </div>
+                  <p className="mt-2 text-[10px] text-slate-500">
+                    Fee philosophy: Flat‑fee, no commissions
+                  </p>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 bg-white/85 p-3">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-700">
+                <div className="min-w-0 rounded-2xl border border-slate-100 bg-white/90 p-3">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-1">
+                    <span className="text-xs font-semibold text-slate-800">
                       Advisor B
                     </span>
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex shrink-0 items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-amber-400" />
                       <span className="text-[10px] font-semibold text-slate-600">
                         Match 78
                       </span>
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600">
-                    Scenario-first analysis, then a phased roadmap based on
-                    risk comfort.
+                  <p className="text-[11px] leading-relaxed text-slate-700">
+                    Recommends keeping existing policies but restructuring
+                    contributions, then adding a separate investment account for
+                    medium‑term goals. Mix of advice fee and product
+                    commission.
                   </p>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full w-[78%] rounded-full bg-linear-to-r from-amber-400 to-emerald-300" />
-                  </div>
+                  <p className="mt-2 text-[10px] text-slate-500">
+                    Fee philosophy: Mixed fee / commission
+                  </p>
                 </div>
               </div>
 
               <div className="mt-4 rounded-2xl border border-dashed border-slate-300/70 bg-linear-to-r from-white via-emerald-50/60 to-lime-50/60 p-3">
-                <p className="text-xs font-semibold text-slate-700">
-                  Compare approaches side‑by‑side — identities stay hidden
-                  until you choose.
+                <p className="text-[11px] font-semibold text-slate-700">
+                  This is how a real case is shown inside Advisens: your
+                  context, situation, and how different advisors would approach
+                  it — before anyone sees who you are.
                 </p>
               </div>
 
-              <div className="mt-5 flex items-center justify-between text-[11px] text-slate-600">
-                <span>3+ advisors invited</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+                <span className="min-w-0">3 advisors invited · 2 responses so far</span>
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white">
                   Live preview
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                 </span>
