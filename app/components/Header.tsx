@@ -39,6 +39,7 @@ export default function Header({ onNavClick, onSubmitCase }: HeaderProps) {
     { label: "Principles", href: "/principles" },
     { label: "Before you begin", href: "/before-you-begin" },
     { label: "For advisors", href: "/for-advisors" },
+    { label: "Insights", href: "/insights" },
   ];
 
   return (

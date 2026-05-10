@@ -115,6 +115,13 @@ export default function Footer() {
                   </div>
                   Data & Anonymity
                 </Link>
+                <Link href="/insights" className="group/item flex items-center gap-2.5 text-sm text-slate-300 transition-all duration-200 hover:text-white hover:translate-x-1">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-linear-to-br from-red-500 to-amber-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
+                    <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-red-500 to-amber-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
+                  </div>
+                  Insights
+                </Link>
               </nav>
             </div>
           </div>
