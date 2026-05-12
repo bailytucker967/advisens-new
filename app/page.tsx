@@ -9,6 +9,8 @@ import Principles from "./components/Principles";
 import BeforeYouBegin from "./components/BeforeYouBegin";
 import ReadyToBegin from "./components/ReadyToBegin";
 import Footer from "./components/Footer";
+import AuroraBackground from "./components/AuroraBackground";
+import CursorGlow from "./components/CursorGlow";
 
 export default function Home() {
   const router = useRouter();
@@ -31,6 +33,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-slate-900 flex flex-col">
+      <AuroraBackground />
+      <CursorGlow />
+
       {/* Global background (same for whole home screen) */}
       <div
         className="fixed inset-0 -z-30 bg-cover bg-center bg-no-repeat"
