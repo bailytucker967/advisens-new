@@ -11,7 +11,10 @@ export interface InsightItem {
   readTime?: string;
   platform?: string;
   tags: string[];
+  externalUrl?: string;
 }
+
+const LI = "https://www.linkedin.com/company/advisens/posts/";
 
 export const insights: InsightItem[] = [
   {
@@ -24,6 +27,7 @@ export const insights: InsightItem[] = [
     date: "10 May 2026",
     readTime: "8 min read",
     tags: ["GCC", "Financial Advice", "Expats"],
+    externalUrl: "https://advisens.com/insights/how-to-vet-a-financial-advisor",
   },
   {
     id: "2",
@@ -49,6 +53,7 @@ That's where vetting should begin.`,
     date: "10 May 2026",
     platform: "LinkedIn",
     tags: ["Brand", "Intro"],
+    externalUrl: LI,
   },
   {
     id: "3",
@@ -68,6 +73,7 @@ Before your next advisor meeting — see how they think first.`,
     date: "14 May 2026",
     platform: "LinkedIn",
     tags: ["Financial Advice", "GCC"],
+    externalUrl: LI,
   },
   {
     id: "4",
@@ -99,6 +105,7 @@ If that question makes your advisor uncomfortable — pay attention to that reac
     date: "18 May 2026",
     platform: "LinkedIn",
     tags: ["Financial Advice", "Education"],
+    externalUrl: LI,
   },
   {
     id: "5",
@@ -120,6 +127,7 @@ The ones who deflect have already told you something important.`,
     date: "22 May 2026",
     platform: "LinkedIn",
     tags: ["Financial Advice", "Red Flags"],
+    externalUrl: LI,
   },
   {
     id: "6",
@@ -141,6 +149,7 @@ Ask for specialisation directly. Before you reveal anything personal.`,
     date: "26 May 2026",
     platform: "LinkedIn",
     tags: ["Expats", "GCC", "Cross-border"],
+    externalUrl: LI,
   },
   {
     id: "7",
@@ -162,6 +171,31 @@ That's what Advisens is for.`,
     date: "30 May 2026",
     platform: "LinkedIn",
     tags: ["Brand", "Platform"],
+    externalUrl: LI,
+  },
+  {
+    id: "12",
+    type: "social",
+    title: "The Surrender Period Trap",
+    excerpt:
+      "You didn't know it was in the small print. Most offshore investment products sold to expats in the GCC come with surrender periods — often 10, 15, or 25 years.",
+    fullContent: `You didn't know it was in the small print.
+
+Most offshore investment products sold to expats in the GCC come with surrender periods — often 10, 15, or 25 years.
+
+Exit early and you lose a significant portion of what you put in. Sometimes everything from the first few years.
+
+The advisor who sold it earned a commission upfront. Your money is locked in — and theirs has already left.
+
+This isn't a rare edge case. It's the standard structure for a category of product that has been sold aggressively to mobile professionals who don't intend to stay in one place for decades.
+
+Before you sign anything — understand the exit terms.
+
+Advisens was built for exactly this kind of situation. Submit your case anonymously. See how qualified advisors would approach your position — before any of them know who you are.`,
+    date: "13 May 2026",
+    platform: "LinkedIn",
+    tags: ["Offshore Products", "GCC", "Expats"],
+    externalUrl: LI,
   },
   {
     id: "8",
@@ -179,6 +213,7 @@ CTA: Learn More`,
     date: "10 May 2026",
     platform: "LinkedIn Ad",
     tags: ["LinkedIn", "Brand Awareness"],
+    externalUrl: LI,
   },
   {
     id: "9",
@@ -196,6 +231,7 @@ CTA: Learn More`,
     date: "10 May 2026",
     platform: "LinkedIn Ad",
     tags: ["LinkedIn", "Brand Awareness"],
+    externalUrl: LI,
   },
   {
     id: "10",
@@ -213,6 +249,7 @@ CTA: Learn More`,
     date: "10 May 2026",
     platform: "LinkedIn Ad",
     tags: ["LinkedIn", "Brand Awareness"],
+    externalUrl: LI,
   },
   {
     id: "11",
@@ -230,5 +267,6 @@ CTA: Learn More`,
     date: "10 May 2026",
     platform: "LinkedIn Ad",
     tags: ["LinkedIn", "Brand Awareness"],
+    externalUrl: LI,
   },
 ];

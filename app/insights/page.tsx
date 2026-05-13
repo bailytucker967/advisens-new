@@ -44,6 +44,20 @@ const filterLabels: { value: "all" | ContentType; label: string }[] = [
   { value: "ad", label: "Ads" },
 ];
 
+function ExternalLinkIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className="h-3 w-3 opacity-70"
+    >
+      <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l5.22-5.22v1.69a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0 0 1.5h1.69L6.22 8.72Z" />
+      <path d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 0 0 7 4H4.75A2.75 2.75 0 0 0 2 6.75v4.5A2.75 2.75 0 0 0 4.75 14h4.5A2.75 2.75 0 0 0 12 11.25V9a.75.75 0 0 0-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5Z" />
+    </svg>
+  );
+}
+
 export default function InsightsPage() {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | ContentType>("all");
@@ -117,10 +131,10 @@ export default function InsightsPage() {
                 return (
                   <div
                     key={item.id}
-                    className={`group relative flex flex-col rounded-2xl border bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 ${cfg.border} ${cfg.hoverBorder} hover:bg-white/8 hover:shadow-lg hover:shadow-black/20 ${isExpanded ? "lg:col-span-1" : ""}`}
+                    className={`group relative flex flex-col rounded-2xl border bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 ${cfg.border} ${cfg.hoverBorder} hover:bg-white/8 hover:shadow-lg hover:shadow-black/20`}
                   >
                     {/* Glow on hover */}
-                    <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}>
+                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                       <div className={`absolute inset-0 rounded-2xl bg-linear-to-br ${cfg.glow} blur-xl`} />
                     </div>
 
@@ -141,7 +155,7 @@ export default function InsightsPage() {
                         {item.title}
                       </h3>
 
-                      {/* Excerpt */}
+                      {/* Excerpt / expanded content */}
                       <p className="text-sm text-slate-300 leading-relaxed mb-4 flex-1">
                         {isExpanded && item.fullContent ? (
                           <span className="whitespace-pre-line text-slate-200">{item.fullContent}</span>
@@ -150,35 +164,53 @@ export default function InsightsPage() {
                         )}
                       </p>
 
-                      {/* Footer */}
+                      {/* Footer row */}
                       <div className="flex items-center justify-between pt-3 border-t border-white/8">
+                        {/* Left: read time (articles only) */}
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-400">{item.date}</span>
                           {item.readTime && (
-                            <>
-                              <span className="h-1 w-1 rounded-full bg-slate-500" />
-                              <span className="text-xs text-slate-400">{item.readTime}</span>
-                            </>
+                            <span className="text-xs text-slate-400">{item.readTime}</span>
                           )}
                         </div>
 
-                        {item.type === "article" && item.slug ? (
-                          <Link
-                            href={`/insights/${item.slug}`}
-                            className={`text-xs font-medium ${cfg.text} hover:text-white transition-colors flex items-center gap-1 group/link`}
-                          >
-                            Read
-                            <span className="transition-transform duration-200 group-hover/link:translate-x-0.5">→</span>
-                          </Link>
-                        ) : item.fullContent ? (
-                          <button
-                            onClick={() => setExpanded(isExpanded ? null : item.id)}
-                            className={`text-xs font-medium ${cfg.text} hover:text-white transition-colors flex items-center gap-1`}
-                          >
-                            {isExpanded ? "Collapse" : "Expand"}
-                            <span className={`transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}>→</span>
-                          </button>
-                        ) : null}
+                        {/* Right: action links */}
+                        <div className="flex items-center gap-3">
+                          {/* External link — always shown when URL exists */}
+                          {item.externalUrl && (
+                            <a
+                              href={item.externalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:${cfg.text} hover:text-white transition-colors`}
+                              title="View externally"
+                            >
+                              <ExternalLinkIcon />
+                              {item.type === "article" ? "View on site" : "View on LinkedIn"}
+                            </a>
+                          )}
+
+                          {/* Article: Read link */}
+                          {item.type === "article" && item.slug && (
+                            <Link
+                              href={`/insights/${item.slug}`}
+                              className={`text-xs font-medium ${cfg.text} hover:text-white transition-colors flex items-center gap-1 group/link`}
+                            >
+                              Read
+                              <span className="transition-transform duration-200 group-hover/link:translate-x-0.5">→</span>
+                            </Link>
+                          )}
+
+                          {/* Social / Ad: expand toggle */}
+                          {item.type !== "article" && item.fullContent && (
+                            <button
+                              onClick={() => setExpanded(isExpanded ? null : item.id)}
+                              className={`text-xs font-medium ${cfg.text} hover:text-white transition-colors flex items-center gap-1`}
+                            >
+                              {isExpanded ? "Collapse" : "Expand"}
+                              <span className={`transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}>→</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Tags */}
