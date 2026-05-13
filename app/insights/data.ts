@@ -14,7 +14,7 @@ export interface InsightItem {
   externalUrl?: string;
 }
 
-const LI = "https://www.linkedin.com/company/advisens/posts/";
+const LI = "https://www.linkedin.com/company/advisensplatform/";
 
 export const insights: InsightItem[] = [
   {
