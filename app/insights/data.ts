@@ -198,6 +198,34 @@ Advisens was built for exactly this kind of situation. Submit your case anonymou
     externalUrl: LI,
   },
   {
+    id: "13",
+    type: "social",
+    title: "The Information Asymmetry",
+    excerpt:
+      "The first time you meet a financial advisor, the information gap is entirely in their favour. They know exactly how they get paid. You walk in knowing almost nothing about them.",
+    fullContent: `The first time you meet a financial advisor, the information gap is entirely in their favour.
+
+They know exactly how they get paid.
+They know which products carry the highest commission.
+They know what questions to ask to move you toward a decision.
+
+You walk in knowing almost nothing about them.
+
+That's not an accident. It's how the industry was designed.
+
+Advisens flips it.
+
+Submit your situation anonymously. See how multiple advisors would actually approach your case — their methodology, their fee structure, their priorities — before anyone schedules a meeting.
+
+You walk into the first conversation already knowing how they think.
+
+That's a different position to negotiate from.`,
+    date: "14 May 2026",
+    platform: "LinkedIn",
+    tags: ["Financial Advice", "GCC", "Brand"],
+    externalUrl: LI,
+  },
+  {
     id: "8",
     type: "ad",
     title: "See How Advisors Think. Stay Anonymous.",
