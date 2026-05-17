@@ -117,15 +117,18 @@ export default function Hero({ onSubmitCase }: HeroProps) {
 
         {/* Right: 3D tilt card */}
         <div className="relative flex-1 min-h-[280px] sm:min-h-0">
-          {/* Ambient blobs */}
-          <div className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.18),transparent_55%)]" />
-          <div className="pointer-events-none absolute -right-6 top-4 sm:-right-10 sm:top-6 -z-20 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-emerald-400/15 blur-3xl" />
-          <div className="pointer-events-none absolute -left-6 bottom-4 sm:-left-12 sm:bottom-6 -z-20 h-32 w-32 sm:h-48 sm:w-48 rounded-full bg-lime-300/15 blur-3xl" />
+          {/* Ambient glow — radial-gradient only, no blur filter */}
+          <div
+            className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20"
+            style={{
+              background: "radial-gradient(circle at 60% 30%, rgba(16,185,129,0.15) 0%, transparent 55%), radial-gradient(circle at 40% 80%, rgba(148,163,184,0.12) 0%, transparent 55%)",
+            }}
+          />
 
           <div className="relative mx-auto max-w-md w-full px-2 sm:px-0">
-            {/* Card stack behind */}
-            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/20 bg-white/8 backdrop-blur-sm" />
-            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/15 bg-white/8 backdrop-blur-sm" />
+            {/* Card stack behind — solid bg, no backdrop-blur (decorative only) */}
+            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/20 bg-white/10" />
+            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/15 bg-white/10" />
 
             {/* Main card — 3D tilt target */}
             <div
@@ -135,7 +138,7 @@ export default function Hero({ onSubmitCase }: HeroProps) {
             >
               <div
                 ref={cardRef}
-                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-md animate-[floaty_7s_ease-in-out_infinite]"
+                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/88 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-sm animate-[floaty_7s_ease-in-out_infinite]"
                 style={{ transformStyle: "preserve-3d", willChange: "transform" }}
               >
                 {/* Animated gradient edge */}
