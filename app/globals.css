@@ -5,10 +5,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom cursor — hide native on pointer devices */
-@media (pointer: fine) {
-  *, *::before, *::after { cursor: none !important; }
-}
 
 /* ── Existing animations ─────────────────────────────────────── */
 @keyframes floaty {
@@ -124,46 +120,6 @@ html {
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Custom cursor ───────────────────────────────────────────── */
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  will-change: transform;
-}
-.cursor-dot-inner {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  margin-left: -3px;
-  margin-top: -3px;
-  transition: transform 0.15s ease, background 0.2s ease;
-}
-.cursor-ring-inner {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.22);
-  margin-left: -18px;
-  margin-top: -18px;
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
-              border-color 0.2s ease,
-              width 0.3s ease,
-              height 0.3s ease;
-}
-
-/* Expand ring when hovering interactive elements */
-a:hover ~ .cursor-ring .cursor-ring-inner,
-button:hover ~ .cursor-ring .cursor-ring-inner {
-  transform: scale(1.6);
-  border-color: rgba(52,211,153,0.5);
-}
 
 /* ── Utilities ───────────────────────────────────────────────── */
 @layer utilities {

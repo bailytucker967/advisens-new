@@ -10,7 +10,6 @@ import BeforeYouBegin from "./components/BeforeYouBegin";
 import ReadyToBegin from "./components/ReadyToBegin";
 import Footer from "./components/Footer";
 import AuroraBackground from "./components/AuroraBackground";
-import CursorGlow from "./components/CursorGlow";
 import MarqueeTicker from "./components/MarqueeTicker";
 
 export default function Home() {
@@ -35,7 +34,6 @@ export default function Home() {
   return (
     <div className="min-h-screen text-slate-900 flex flex-col">
       <AuroraBackground />
-      <CursorGlow />
 
       {/* Global background (same for whole home screen) */}
       <div

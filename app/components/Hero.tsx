@@ -40,18 +40,20 @@ export default function Hero({ onSubmitCase }: HeroProps) {
     const y = e.clientY - rect.top;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const rotX = ((y - cy) / cy) * -8;
-    const rotY = ((x - cx) / cx) * 8;
-    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(12px)`;
-    card.style.transition = "transform 0.08s linear";
+    const rotX = ((y - cy) / cy) * -7;
+    const rotY = ((x - cx) / cx) * 7;
+    card.style.willChange = "transform";
+    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px)`;
+    card.style.transition = "transform 0.1s linear";
   };
 
   const handleTiltLeave = () => {
     const card = cardRef.current;
     if (!card) return;
-    card.style.transform =
-      "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+    card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
     card.style.transition = "transform 0.6s cubic-bezier(0.16,1,0.3,1)";
+    // Release the compositor layer once animation settles
+    setTimeout(() => { if (cardRef.current) cardRef.current.style.willChange = "auto"; }, 700);
   };
 
   return (
@@ -138,8 +140,8 @@ export default function Hero({ onSubmitCase }: HeroProps) {
             >
               <div
                 ref={cardRef}
-                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/88 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-sm animate-[floaty_7s_ease-in-out_infinite]"
-                style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/88 p-4 sm:p-5 shadow-2xl shadow-black/30 backdrop-blur-sm"
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {/* Animated gradient edge */}
                 <div className="pointer-events-none absolute -inset-[2px] -z-10 rounded-[26px] bg-linear-to-br from-emerald-400/60 via-white/30 to-lime-300/60 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
