@@ -7,8 +7,30 @@ interface HeroProps {
   onSubmitCase: () => void;
 }
 
+// Magnetic button — pulls toward cursor on hover, springs back on leave
+function useMagnetic() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const onMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const dx = (e.clientX - (rect.left + rect.width / 2)) * 0.28;
+    const dy = (e.clientY - (rect.top + rect.height / 2)) * 0.28;
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+    el.style.transition = "transform 0.1s ease";
+  };
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = "translate(0px, 0px)";
+    el.style.transition = "transform 0.65s cubic-bezier(0.16,1,0.3,1)";
+  };
+  return { ref, onMove, onLeave };
+}
+
 export default function Hero({ onSubmitCase }: HeroProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const cta = useMagnetic();
 
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -42,7 +64,8 @@ export default function Hero({ onSubmitCase }: HeroProps) {
             Senior professionals in the GCC managing cross-border finances and long-term planning.
           </p>
 
-          <h1 className="max-w-xl text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+          {/* Headline — larger, tighter, more presence */}
+          <h1 className="max-w-xl text-left text-5xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
             <span className="block overflow-hidden">
               <span className="text-reveal text-reveal-2 block">
                 Compare approaches
@@ -50,35 +73,39 @@ export default function Hero({ onSubmitCase }: HeroProps) {
             </span>
             <span className="block overflow-hidden">
               <span className="text-reveal text-reveal-3 block">
-                before identities are
+                before identities
               </span>
             </span>
             <span className="block overflow-hidden">
-              <span className="text-reveal text-reveal-4 block">
-                revealed
+              <span className="text-reveal text-reveal-4 block bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+                are revealed.
               </span>
             </span>
           </h1>
 
-          <p className="text-reveal text-reveal-4 max-w-xl text-left text-base leading-relaxed text-slate-100 sm:text-lg">
+          <p className="text-reveal text-reveal-4 max-w-xl text-left text-base leading-relaxed text-slate-200 sm:text-lg">
             A decision-preparation platform for people in the GCC considering
             financial advice. Submit your case anonymously, review how
             different advisors would approach it, and choose what aligns.
           </p>
 
-          <p className="text-reveal text-reveal-5 max-w-xl text-left text-sm text-slate-200">
+          <p className="text-reveal text-reveal-5 max-w-xl text-left text-sm text-slate-300/80">
             Cases are submitted anonymously. Advisors respond without knowing
             who you are.
           </p>
 
-          <div className="text-reveal text-reveal-5 flex flex-wrap items-center gap-4 pt-2">
+          <div className="text-reveal text-reveal-5 flex flex-wrap items-center gap-5 pt-2">
+            {/* Magnetic CTA */}
             <button
+              ref={cta.ref}
+              onMouseMove={cta.onMove}
+              onMouseLeave={cta.onLeave}
               onClick={onSubmitCase}
-              className="rounded-full bg-white/95 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/40 transition hover:-translate-y-0.5 hover:bg-white cursor-pointer"
+              className="magnetic rounded-full bg-white/95 px-7 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/40 hover:bg-white"
             >
               Submit a Case
             </button>
-            <button className="text-sm font-medium text-white/90 underline-offset-4 hover:text-white cursor-pointer">
+            <button className="text-sm font-medium text-white/75 hover:text-white transition-colors duration-200">
               See sample cases
             </button>
           </div>
@@ -91,14 +118,14 @@ export default function Hero({ onSubmitCase }: HeroProps) {
         {/* Right: 3D tilt card */}
         <div className="relative flex-1 min-h-[280px] sm:min-h-0">
           {/* Ambient blobs */}
-          <div className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.22),transparent_55%)]" />
-          <div className="pointer-events-none absolute -right-6 top-4 sm:-right-10 sm:top-6 -z-20 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-emerald-400/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-6 bottom-4 sm:-left-12 sm:bottom-6 -z-20 h-32 w-32 sm:h-48 sm:w-48 rounded-full bg-lime-300/20 blur-3xl" />
+          <div className="pointer-events-none absolute -inset-4 sm:-inset-12 -z-20 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(148,163,184,0.18),transparent_55%)]" />
+          <div className="pointer-events-none absolute -right-6 top-4 sm:-right-10 sm:top-6 -z-20 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-emerald-400/15 blur-3xl" />
+          <div className="pointer-events-none absolute -left-6 bottom-4 sm:-left-12 sm:bottom-6 -z-20 h-32 w-32 sm:h-48 sm:w-48 rounded-full bg-lime-300/15 blur-3xl" />
 
           <div className="relative mx-auto max-w-md w-full px-2 sm:px-0">
             {/* Card stack behind */}
-            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/25 bg-white/10 backdrop-blur-sm" />
-            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/20 bg-white/10 backdrop-blur-sm" />
+            <div className="pointer-events-none absolute left-3 top-4 sm:left-6 sm:top-6 -z-10 h-[92%] w-[92%] -rotate-6 rounded-3xl border border-white/20 bg-white/8 backdrop-blur-sm" />
+            <div className="pointer-events-none absolute right-2 top-6 sm:right-4 sm:top-10 -z-10 h-[90%] w-[90%] rotate-[5deg] rounded-3xl border border-white/15 bg-white/8 backdrop-blur-sm" />
 
             {/* Main card — 3D tilt target */}
             <div

@@ -1,70 +1,90 @@
 @import "tailwindcss";
 
+/* ── Base ────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom cursor — hide native on pointer devices */
+@media (pointer: fine) {
+  *, *::before, *::after { cursor: none !important; }
+}
+
 /* ── Existing animations ─────────────────────────────────────── */
 @keyframes floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%) rotate(12deg); }
+  0%   { transform: translateX(-100%) rotate(12deg); }
   100% { transform: translateX(200%) rotate(12deg); }
 }
 
 @keyframes mobile-menu-slide {
   from { opacity: 0; transform: translateY(-12px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes mobile-menu-backdrop {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 /* ── Aurora background blobs ─────────────────────────────────── */
+/* IMPORTANT: scale() + blur = GPU recomposite every frame → lag  */
+/* All aurora keyframes use translate3d only for compositor perf   */
 @keyframes aurora-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25%       { transform: translate(60px, -80px) scale(1.15); }
-  50%       { transform: translate(-40px, 60px) scale(0.92); }
-  75%       { transform: translate(80px, 40px) scale(1.08); }
+  0%, 100% { transform: translate3d(0,    0,    0); }
+  25%       { transform: translate3d(50px, -60px, 0); }
+  50%       { transform: translate3d(-30px, 50px, 0); }
+  75%       { transform: translate3d(60px,  30px, 0); }
 }
-
 @keyframes aurora-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  30%       { transform: translate(-70px, 50px) scale(1.1); }
-  60%       { transform: translate(50px, -60px) scale(0.95); }
+  0%, 100% { transform: translate3d(0,     0,    0); }
+  30%       { transform: translate3d(-55px, 40px, 0); }
+  60%       { transform: translate3d(40px, -50px, 0); }
 }
-
 @keyframes aurora-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40%       { transform: translate(40px, 80px) scale(1.12); }
-  70%       { transform: translate(-60px, -40px) scale(0.88); }
+  0%, 100% { transform: translate3d(0,    0,     0); }
+  40%       { transform: translate3d(35px, 60px,  0); }
+  70%       { transform: translate3d(-45px,-30px, 0); }
 }
-
 @keyframes aurora-4 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33%       { transform: translate(-50px, -70px) scale(1.2) rotate(10deg); }
-  66%       { transform: translate(70px, 30px) scale(0.9) rotate(-5deg); }
+  0%, 100% { transform: translate3d(0,     0,     0); }
+  33%       { transform: translate3d(-40px,-55px, 0); }
+  66%       { transform: translate3d(55px,  25px, 0); }
+}
+@keyframes aurora-5 {
+  0%, 100% { transform: translate3d(0,     0,    0); }
+  50%       { transform: translate3d(-60px,-40px, 0); }
 }
 
-@keyframes aurora-5 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%       { transform: translate(-80px, -50px) scale(1.18); }
+/* ── Marquee ticker ──────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
 }
 
 /* ── Scroll reveal ───────────────────────────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
@@ -84,12 +104,10 @@
     filter: blur(0px);
   }
 }
-
 .text-reveal {
   opacity: 0;
-  animation: text-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: text-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-
 .text-reveal-1 { animation-delay: 0.1s; }
 .text-reveal-2 { animation-delay: 0.28s; }
 .text-reveal-3 { animation-delay: 0.46s; }
@@ -99,13 +117,54 @@
 /* ── 3D tilt ─────────────────────────────────────────────────── */
 .tilt-card {
   transform-style: preserve-3d;
-  transition: transform 0.08s linear, box-shadow 0.3s ease;
   will-change: transform;
 }
 
-.tilt-card:not(:hover) {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.5s ease;
+/* ── Magnetic button ─────────────────────────────────────────── */
+.magnetic {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* ── Custom cursor ───────────────────────────────────────────── */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+.cursor-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  margin-left: -3px;
+  margin-top: -3px;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.cursor-ring-inner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  margin-left: -18px;
+  margin-top: -18px;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.2s ease,
+              width 0.3s ease,
+              height 0.3s ease;
+}
+
+/* Expand ring when hovering interactive elements */
+a:hover ~ .cursor-ring .cursor-ring-inner,
+button:hover ~ .cursor-ring .cursor-ring-inner {
+  transform: scale(1.6);
+  border-color: rgba(52,211,153,0.5);
 }
 
 /* ── Utilities ───────────────────────────────────────────────── */
