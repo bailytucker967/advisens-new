@@ -1,92 +1,85 @@
 "use client";
 
+import ScrollReveal from "./ScrollReveal";
+
+// Each principle is a bold line of text — the typography IS the design.
+// No card, no bullets, no container. Just weight and conviction.
+const LINES = [
+  { text: "No commissions.", sub: "Ever.", depth: 18 },
+  { text: "No unsolicited contact.", sub: "Ever.", depth: 12 },
+  { text: "No rankings or endorsements.", sub: "Ever.", depth: 8 },
+  { text: "No financial advice.", sub: "Ever.", depth: 14 },
+];
+
 export default function Principles() {
   return (
-    <section id="principles" className="relative border-t border-white/10 overflow-hidden">
-      <div className="relative mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-12">
-        <div className="group relative rounded-3xl border border-white/20 bg-white/10 backdrop-blur-md p-7 shadow-lg shadow-black/20 md:p-9 overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-black/30 hover:border-white/30">
-          <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-red-500/10 via-amber-500/10 to-orange-500/10 blur-2xl"></div>
-          </div>
+    <section id="principles" className="relative overflow-hidden py-20 md:py-28">
 
-          <div className="absolute inset-0 opacity-[0.015]" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }}></div>
+      {/* Ambient left glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 15% 50%, rgba(239,68,68,0.05) 0%, transparent 55%)",
+          transform: "translate(calc(var(--px, 0) * -18px), calc(var(--py, 0) * -10px))",
+        }}
+      />
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-8 bg-linear-to-r from-red-500 to-amber-500"></div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300 transition-colors duration-300 group-hover:text-slate-200">
-                Guardrails
-              </p>
-            </div>
-            
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl transition-colors duration-300 group-hover:text-white">
-              What we don&apos;t do
+      <div className="relative mx-auto max-w-5xl px-4 md:px-6">
+
+        <ScrollReveal className="mb-12 md:mb-16">
+          <div style={{ transform: "translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px))" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-red-400/70">
+              Our guardrails
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              What we don&apos;t do.
             </h2>
+          </div>
+        </ScrollReveal>
 
-            <ul className="mt-6 space-y-3 text-sm leading-relaxed text-slate-200 md:text-base">
-              <li className="flex gap-3 group/item transition-all duration-300 hover:translate-x-1">
-                <div className="relative mt-1.5">
-                  <div className="absolute inset-0 bg-linear-to-br from-red-500 to-amber-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
-                  <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-red-500 to-amber-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
-                </div>
-                <span className="transition-colors duration-300 group-hover/item:text-white">
-                  We do not receive commissions or referral fees.
+        <div>
+          {LINES.map((line, i) => (
+            <ScrollReveal key={i} delay={((i % 5) + 1) as 1 | 2 | 3 | 4 | 5}>
+              <div
+                className="group flex items-baseline justify-between border-t border-white/8 py-7 md:py-9 transition-colors duration-300 hover:border-white/16 first:border-0"
+                style={{
+                  transform: `translate(calc(var(--px, 0) * ${-line.depth}px), calc(var(--py, 0) * ${-line.depth * 0.55}px))`,
+                }}
+              >
+                {/* Line number */}
+                <span
+                  className="text-xs font-semibold text-white/15 tabular-nums mr-8 shrink-0 group-hover:text-white/30 transition-colors"
+                  style={{ transform: `translate(calc(var(--px, 0) * ${line.depth * 0.3}px), 0)` }}
+                >
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-              </li>
-              
-              <li className="flex gap-3 group/item transition-all duration-300 hover:translate-x-1">
-                <div className="relative mt-1.5">
-                  <div className="absolute inset-0 bg-linear-to-br from-red-500 to-amber-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
-                  <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-red-500 to-amber-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
-                </div>
-                <span className="transition-colors duration-300 group-hover/item:text-white">
-                  Advisors cannot contact you without your explicit consent.
-                </span>
-              </li>
-              
-              <li className="flex gap-3 group/item transition-all duration-300 hover:translate-x-1">
-                <div className="relative mt-1.5">
-                  <div className="absolute inset-0 bg-linear-to-br from-red-500 to-amber-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
-                  <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-red-500 to-amber-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
-                </div>
-                <span className="transition-colors duration-300 group-hover/item:text-white">
-                  We do not rank, endorse, or refer you to specific advisors.
-                </span>
-              </li>
-              
-              <li className="flex gap-3 group/item transition-all duration-300 hover:translate-x-1">
-                <div className="relative mt-1.5">
-                  <div className="absolute inset-0 bg-linear-to-br from-red-500 to-amber-500 rounded-full blur-sm opacity-0 group-hover/item:opacity-60 transition-opacity duration-300"></div>
-                  <div className="relative h-1.5 w-1.5 rounded-full bg-linear-to-br from-red-500 to-amber-500 shadow-sm transition-all duration-300 group-hover/item:scale-150"></div>
-                </div>
-                <span className="transition-colors duration-300 group-hover/item:text-white">
-                  We do not provide financial advice or recommend products.
-                </span>
-              </li>
-            </ul>
 
-            <div className="relative mt-6 border-t border-white/20 pt-4 transition-all duration-300 group-hover:border-white/30">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-md bg-linear-to-br from-slate-700 to-slate-900 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-md">
-                  <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                  </svg>
-                </div>
-                <p className="text-xs text-slate-300 md:text-sm transition-colors duration-300 group-hover:text-slate-200">
-                  Advisors participate under defined eligibility and behavioural standards.
+                {/* Main text */}
+                <p className="flex-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl group-hover:text-white transition-colors">
+                  {line.text}{" "}
+                  <span className="text-red-400/60 group-hover:text-red-400/90 transition-colors">
+                    {line.sub}
+                  </span>
                 </p>
               </div>
-            </div>
-          </div>
+            </ScrollReveal>
+          ))}
 
-          <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-red-500/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          {/* Final note */}
+          <ScrollReveal delay={5}>
+            <div
+              className="border-t border-white/8 pt-7 md:pt-9"
+              style={{ transform: "translate(calc(var(--px, 0) * -5px), calc(var(--py, 0) * -3px))" }}
+            >
+              <p className="text-sm text-slate-500 max-w-lg">
+                Advisors participate under defined eligibility and behavioural standards.
+                The platform exists to give you clarity — not to sell you anything.
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
+
       </div>
     </section>
   );
 }
-
-

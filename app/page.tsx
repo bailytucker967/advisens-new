@@ -1,4 +1,4 @@
-"use client";              
+"use client";
 
 import React from "react";
 import { useRouter } from "next/navigation";
@@ -11,47 +11,50 @@ import ReadyToBegin from "./components/ReadyToBegin";
 import Footer from "./components/Footer";
 import AuroraBackground from "./components/AuroraBackground";
 import MarqueeTicker from "./components/MarqueeTicker";
+import MouseParallax from "./components/MouseParallax";
+import StatsBar from "./components/StatsBar";
 
 export default function Home() {
   const router = useRouter();
-  
+
   const handleSubmitCase = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     router.push("/submit");
   };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
       const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
   };
 
   return (
     <div className="min-h-screen text-slate-900 flex flex-col">
+      {/* Global parallax engine — sets --px / --py on :root */}
+      <MouseParallax />
+
       <AuroraBackground />
 
-      {/* Global background (same for whole home screen) */}
+      {/* Background image */}
       <div
         className="fixed inset-0 -z-30 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/web%20background.jpeg')" }}
-          />
-          {/* Darken/soften overlay for readability */}
+        style={{ backgroundImage: "url('/web%20background.jpeg')" }}
+      />
+      {/* Overlay */}
       <div className="fixed inset-0 -z-20 bg-linear-to-b from-black/35 via-black/20 to-black/10" />
 
-      {/* Hero + content */}
       <main id="home" className="relative flex-1">
         <Header onNavClick={handleNavClick} onSubmitCase={handleSubmitCase} />
         <Hero onSubmitCase={handleSubmitCase} />
         <MarqueeTicker />
         <HowItWorks />
+        <StatsBar />
         <BeforeYouBegin />
-        <ReadyToBegin onSubmitCase={handleSubmitCase} />
         <Principles />
+        <ReadyToBegin onSubmitCase={handleSubmitCase} />
       </main>
 
       <Footer />
