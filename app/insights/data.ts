@@ -198,6 +198,50 @@ Advisens was built for exactly this kind of situation. Submit your case anonymou
     externalUrl: LI,
   },
   {
+    id: "14",
+    type: "social",
+    title: "The 41-Year-Old Expat",
+    excerpt:
+      "A 41 year old expat in Dubai sat across from a financial advisor. Felt understood. Signed a 25 year savings plan. Three years later he moved back to the UK. Surrender charges: £18,000.",
+    fullContent: `A 41 year old expat in Dubai sat across from a financial advisor.
+
+Felt understood.
+
+Signed a 25 year savings plan.
+
+Left feeling sorted.
+
+Three years later he moved back to the UK.
+
+Surrender charges: £18,000.
+
+The advisor: unreachable.
+
+This isn't a rare story.
+
+It's the most common one we hear from people in the GCC.
+
+The problem wasn't that he chose the wrong advisor.
+
+The problem was he had no way to evaluate the approach before he committed to it. No second opinion. No comparison. No understanding of what the fee structure actually meant for him long term.
+
+Just a confident conversation and a signature.
+
+Advisens exists for the moment before that signature.
+
+Submit your situation anonymously. See how multiple advisors would actually approach your case: their thinking, their fees, their priorities; before anyone knows who you are.
+
+You choose the approach first.
+
+The advisor second.
+
+That's the order it should always happen in.`,
+    date: "21 May 2026",
+    platform: "LinkedIn",
+    tags: ["Expats", "GCC", "Offshore Products"],
+    externalUrl: LI,
+  },
+  {
     id: "13",
     type: "social",
     title: "The Information Asymmetry",
