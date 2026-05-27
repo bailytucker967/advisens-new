@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Advisens - Senior professionals in the GCC managing cross-border finances and long-term planning.",
-  description: "Senior professionals in the GCC managing cross-border finances and long-term planning.",
+  title: "Advisens — Report intelligence for GCC & international financial advisers",
+  description:
+    "Advisens learns the structure, language, and product universe of your existing reports. Every future client report is pre-populated, fact-checked, and ready to ship in minutes.",
 };
 
 export const viewport: Viewport = {
