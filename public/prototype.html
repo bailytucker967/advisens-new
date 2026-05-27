@@ -110,16 +110,19 @@
   /* Marquee-soft logo strip */
   .logo-strip { mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent); }
 
-  /* Scroll reveal */
+  /* Scroll reveal — sections are visible by default, animation is additive
+     when a `data-reveal` attribute is added by JS. Avoids the failure mode
+     where the IntersectionObserver never fires and everything stays at
+     opacity: 0. */
   section { opacity: 1; }
-  section:not(:first-of-type) {
+  section[data-reveal="pending"] {
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 720ms cubic-bezier(0.23, 1, 0.32, 1), transform 720ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  section.revealed { opacity: 1; transform: translateY(0); }
+  section[data-reveal="shown"] { opacity: 1; transform: translateY(0); }
   @media (prefers-reduced-motion: reduce) {
-    section:not(:first-of-type) { opacity: 1; transform: none; transition: none; }
+    section[data-reveal] { opacity: 1; transform: none; transition: none; }
   }
 
   /* Hero preview parallax target */
@@ -2716,17 +2719,53 @@ function advanceHero() {
 renderHeroSlide();
 heroTimer = setInterval(advanceHero, 4500);
 
-/* ============== Scroll reveal observer ============== */
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('revealed');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+/* ============== Scroll reveal observer ==============
+   Animation is opt-in: only sections we explicitly mark with
+   data-reveal="pending" start hidden, and the observer flips them to
+   "shown" once they reach the viewport. A safety timeout reveals
+   everything 1.2s after script load even if the observer fails to fire.
+*/
+(function setupReveal() {
+  const sections = Array.from(document.querySelectorAll('section'));
+  if (sections.length === 0) return;
 
-document.querySelectorAll('section').forEach(s => revealObserver.observe(s));
+  // Mark every section except the first to fade in
+  sections.slice(1).forEach((s) => s.setAttribute('data-reveal', 'pending'));
+
+  // Reveal helper
+  const reveal = (el) => el.setAttribute('data-reveal', 'shown');
+
+  // IntersectionObserver path
+  let observer = null;
+  try {
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          reveal(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+    sections.slice(1).forEach((s) => observer.observe(s));
+  } catch (e) {
+    // Fall through to safety timeout
+  }
+
+  // Safety net: if the observer didn't catch the section within 1.2s,
+  // reveal it anyway so nothing stays invisible.
+  setTimeout(() => {
+    sections.slice(1).forEach(reveal);
+  }, 1200);
+
+  // Also reveal any section that's already inside the viewport on load
+  // (covers cases where the observer's rootMargin excludes them).
+  requestAnimationFrame(() => {
+    sections.slice(1).forEach((s) => {
+      const rect = s.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) reveal(s);
+    });
+  });
+})();
 
 /* ============== SCROLL-DRIVEN ANIMATIONS ============== */
 
