@@ -106,23 +106,38 @@ export default function PlatformClient({
 
   return (
     <>
-      {!ready && (
-        <div className="fixed inset-0 grid place-items-center bg-[#0a0e16] z-[60]">
-          <div className="text-center">
-            <div className="inline-block h-6 w-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-3" />
-            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-              Loading prototype
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/*
+        The host div MUST stay at the same fragment position across renders
+        AND have a stable key. If we conditionally render the overlay before
+        it, React reconciles by index and may reuse the overlay div as the
+        host (or vice versa) when `ready` flips, destroying the original
+        host DOM node and detaching the event listeners attached by the
+        injected script. Keeping the host first and always rendering the
+        overlay (toggling visibility via opacity + pointer-events) avoids
+        the reconciliation swap entirely.
+      */}
       <div
+        key="host"
         ref={containerRef}
         id="platform-prototype-host"
         className="text-slate-100 bg-[#0a0e16]"
         dangerouslySetInnerHTML={{ __html: bodyContent }}
       />
+      <div
+        key="overlay"
+        aria-hidden={ready}
+        className={
+          "fixed inset-0 grid place-items-center bg-[#0a0e16] z-[60] transition-opacity duration-200 " +
+          (ready ? "opacity-0 pointer-events-none" : "opacity-100")
+        }
+      >
+        <div className="text-center">
+          <div className="inline-block h-6 w-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
+            Loading prototype
+          </div>
+        </div>
+      </div>
     </>
   );
 }
