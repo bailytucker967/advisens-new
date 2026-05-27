@@ -1,6 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import to avoid SSR issues with Three.js
+const HeroBackground3D = dynamic(
+  () => import("./components/HeroBackground3D"),
+  { ssr: false }
+);
 
 interface Props {
   headContent: string;
@@ -161,11 +168,25 @@ export default function PlatformClient({
 
   return (
     <>
+      {/* 3D Background for Hero Section */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          zIndex: 1,
+          height: "100vh",
+          maskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        }}
+      >
+        <HeroBackground3D />
+      </div>
+
       <div
         key="host"
         ref={containerRef}
         id="platform-prototype-host"
-        className="text-slate-100 bg-[#0a0e16]"
+        className="relative text-slate-100 bg-transparent"
+        style={{ zIndex: 2 }}
         dangerouslySetInnerHTML={{ __html: bodyContent }}
       />
       <div
