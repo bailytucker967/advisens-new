@@ -1,8 +1,23 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+
+// Check if WebGL is available
+function isWebGLAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    return gl !== null;
+  } catch {
+    return false;
+  }
+}
 
 // Floating particles that respond to mouse movement
 function Particles({ count = 200 }: { count?: number }) {
@@ -338,7 +353,80 @@ function Scene() {
   );
 }
 
+// CSS-based fallback background when WebGL is not available
+function FallbackBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent)",
+        }}
+      />
+      {/* Animated dots */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-emerald-500/20 animate-pulse"
+            style={{
+              width: `${4 + Math.random() * 8}px`,
+              height: `${4 + Math.random() * 8}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+      {/* Subtle grid lines */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(16, 185, 129, 0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function HeroBackground3D() {
+  const [webGLSupported, setWebGLSupported] = useState<boolean | null>(null);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setWebGLSupported(isWebGLAvailable());
+  }, []);
+
+  // Show nothing during SSR or while checking
+  if (webGLSupported === null) {
+    return (
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
+    );
+  }
+
+  // Show fallback if WebGL is not supported or there was an error
+  if (!webGLSupported || hasError) {
+    return (
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
+        <FallbackBackground />
+      </div>
+    );
+  }
+
   return (
     <div
       className="absolute inset-0 pointer-events-none"
@@ -347,8 +435,15 @@ export default function HeroBackground3D() {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 60 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, failIfMajorPerformanceCaveat: true }}
         dpr={[1, 2]}
+        onCreated={({ gl }) => {
+          // Additional safety check
+          if (!gl.getContext()) {
+            setHasError(true);
+          }
+        }}
+        fallback={<FallbackBackground />}
       >
         <Scene />
       </Canvas>
