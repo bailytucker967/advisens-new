@@ -1,0 +1,2844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Advisens — Report intelligence for GCC &amp; international financial advisers</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --emerald: #10b981;
+    --emerald-bright: #34d399;
+    --amber: #fbbf24;
+    --purple-soft: #a78bfa;
+    --indigo-soft: #818cf8;
+
+    /* Document interior palette — Carta/Stripe style */
+    --doc-ink: #0a0e16;
+    --doc-text: #1f2937;
+    --doc-muted: #475569;
+    --doc-dim: #94a3b8;
+    --doc-line: #e2e8f0;
+    --doc-card: #f8fafc;
+    --doc-card-warm: #fafaf7;
+    --teal: #0d9488;
+    --teal-soft: #14b8a6;
+    --gold: #b45309;
+    --gold-soft: #fbbf24;
+    --indigo: #4f46e5;
+    --rose-soft: #f43f5e;
+    --positive: #059669;
+    --negative: #dc2626;
+  }
+  html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  .font-serif { font-family: 'Source Serif 4', Georgia, serif; }
+  .font-display { font-family: 'Instrument Serif', 'Source Serif 4', Georgia, serif; font-weight: 400; }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  body {
+    background: #0a0e16;
+    background-image:
+      radial-gradient(1100px 600px at 8% -5%, rgba(16,185,129,0.08), transparent 65%),
+      radial-gradient(900px 500px at 100% 12%, rgba(167,139,250,0.06), transparent 60%),
+      linear-gradient(180deg, #0b1119 0%, #0a0e16 50%, #080b12 100%);
+    color: #e7ecf3;
+    min-height: 100vh;
+  }
+
+  /* Subtle dot grid background for hero */
+  .dot-grid {
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Soft mesh gradient */
+  .mesh-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(600px 300px at 50% 0%, rgba(16,185,129,0.10), transparent 70%),
+      radial-gradient(400px 200px at 10% 100%, rgba(251,191,36,0.05), transparent 70%);
+  }
+
+  /* Section eyebrow */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+  }
+  .eyebrow-dot {
+    width: 6px; height: 6px; border-radius: 999px; background: var(--emerald-bright);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+  }
+
+  /* Display headline gradient (subtle) */
+  .display-grad {
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Number badge */
+  .num-badge {
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--emerald-bright);
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  /* Card hover lift (subtle) */
+  .card-lift { transition: transform 240ms var(--ease-out), border-color 200ms var(--ease-out), background-color 200ms var(--ease-out); }
+  .card-lift:hover { transform: translateY(-2px); }
+
+  /* Marquee-soft logo strip */
+  .logo-strip { mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent); }
+
+  /* Scroll reveal */
+  section { opacity: 1; }
+  section:not(:first-of-type) {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 720ms cubic-bezier(0.23, 1, 0.32, 1), transform 720ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  section.revealed { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    section:not(:first-of-type) { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* Hero preview parallax target */
+  #heroPreview { transition: transform 80ms linear; will-change: transform; }
+
+  /* Workflow step active state */
+  [data-workflow-step] {
+    position: relative;
+    transition: background-color 600ms var(--ease-out);
+  }
+  [data-workflow-step] .num-badge {
+    transition: background-color 600ms var(--ease-out), color 600ms var(--ease-out), border-color 600ms var(--ease-out), transform 600ms var(--ease-out);
+  }
+  [data-workflow-step].step-active .num-badge {
+    background: rgba(16, 185, 129, 0.20);
+    color: #fff;
+    border-color: rgba(16, 185, 129, 0.45);
+    transform: scale(1.08);
+  }
+  [data-workflow-step]::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(16,185,129,0), transparent);
+    transition: background 800ms var(--ease-out);
+    pointer-events: none;
+  }
+  [data-workflow-step].step-active::after {
+    background: linear-gradient(180deg, transparent 0%, rgba(16,185,129,0.5) 50%, transparent 100%);
+  }
+
+  /* Counter pulse on animation */
+  [data-count].counting {
+    color: #34d399;
+    transition: color 400ms var(--ease-out);
+  }
+
+  /* Background parallax layer */
+  [data-parallax] { will-change: transform; }
+
+  .text-balance { text-wrap: balance; }
+  .hairline { border-color: rgba(255,255,255,0.08); }
+  .num { font-feature-settings: "tnum" 1, "lnum" 1; }
+  .doc { box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 60px -20px rgba(0,0,0,0.5); }
+
+  /* Buttons */
+  button, .btn { transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out); }
+  button:active:not(:disabled), .btn:active { transform: scale(0.97); }
+
+  /* Page reveal */
+  .page-enter { opacity: 0; transform: translateY(6px); }
+  .page-enter-active { opacity: 1; transform: translateY(0); transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+
+  .agent-card { transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out); }
+
+  /* Stagger */
+  .stagger > * { opacity: 0; transform: translateY(4px); animation: stagger-in 380ms var(--ease-out) forwards; }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 40ms; }
+  .stagger > *:nth-child(3) { animation-delay: 80ms; }
+  .stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .stagger > *:nth-child(6) { animation-delay: 200ms; }
+  .stagger > *:nth-child(7) { animation-delay: 240ms; }
+  .stagger > *:nth-child(8) { animation-delay: 280ms; }
+  @keyframes stagger-in { to { opacity: 1; transform: translateY(0); } }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 10px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+
+  .hr-dotted { background-image: linear-gradient(90deg, rgba(255,255,255,0.18) 50%, transparent 50%); background-size: 6px 1px; background-repeat: repeat-x; background-position: 0 50%; height: 1px; }
+
+  /* ==================== Document interior styling (Carta/Stripe-grade) ==================== */
+  .doc-page { color: var(--doc-text); }
+  .doc-page .label { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--doc-muted); }
+  .doc-page .label-dim { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; color: var(--doc-dim); }
+  .doc-page h2.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.018em; color: #0f172a; line-height: 1.15; }
+  .doc-page h3 { font-weight: 600; color: #0f172a; letter-spacing: -0.01em; }
+  .doc-page .display-num { font-size: 36px; font-weight: 600; letter-spacing: -0.025em; color: #0f172a; line-height: 1; font-feature-settings: "tnum" 1, "lnum" 1; }
+  .doc-page .display-num-sm { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; color: #0f172a; line-height: 1; font-feature-settings: "tnum" 1, "lnum" 1; }
+  .doc-page .body-prose { font-family: 'Source Serif 4', Georgia, serif; color: #1e293b; font-size: 12.5px; line-height: 1.7; }
+
+  .doc-card { background: white; border: 1px solid var(--doc-line); border-radius: 10px; padding: 18px; }
+  .doc-card-tinted { background: var(--doc-card); border: 1px solid var(--doc-line); border-radius: 10px; padding: 18px; }
+  .doc-card-warm { background: var(--doc-card-warm); border: 1px solid #ede9d6; border-radius: 10px; padding: 18px; }
+  .doc-card-hero { background: linear-gradient(135deg, #0a0e16 0%, #1f2937 100%); color: white; border-radius: 10px; padding: 22px; position: relative; overflow: hidden; }
+
+  /* Accent stripe on left of cards */
+  .accent-stripe { position: relative; padding-left: 14px; }
+  .accent-stripe::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; border-radius: 1px; background: var(--teal); }
+  .accent-stripe.gold::before { background: var(--gold); }
+  .accent-stripe.indigo::before { background: var(--indigo); }
+  .accent-stripe.rose::before { background: var(--rose-soft); }
+  .accent-stripe.slate::before { background: var(--doc-dim); }
+
+  /* Pills */
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; padding: 2px 7px; border-radius: 999px; font-weight: 600; letter-spacing: 0.02em; }
+  .pill-teal { background: #ccfbf1; color: #115e59; }
+  .pill-gold { background: #fef3c7; color: #92400e; }
+  .pill-indigo { background: #e0e7ff; color: #3730a3; }
+  .pill-slate { background: #f1f5f9; color: #475569; }
+  .pill-rose { background: #ffe4e6; color: #be123c; }
+  .pill-emerald { background: #d1fae5; color: #065f46; }
+
+  /* Mono numeric */
+  .mono-num { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1, "lnum" 1; }
+
+  /* Hairline divider */
+  .hl { background: var(--doc-line); height: 1px; }
+
+  /* Doc decorative gradient — for cover and hero moments */
+  .doc-gradient {
+    background:
+      radial-gradient(900px 500px at 100% 0%, rgba(13,148,136,0.10), transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, rgba(180,83,9,0.08), transparent 60%),
+      linear-gradient(180deg, #ffffff 0%, #fafaf7 100%);
+  }
+
+  /* Heatmap cell */
+  .hm { font-feature-settings: "tnum" 1, "lnum" 1; font-family: 'JetBrains Mono', monospace; }
+
+  /* Subtle SVG underline accent */
+  .underline-accent { position: relative; display: inline-block; }
+  .underline-accent::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 6px; background: rgba(13, 148, 136, 0.18); border-radius: 2px; z-index: -1; }
+</style>
+</head>
+<body class="text-slate-100">
+
+<!-- ============ HEADER ============ -->
+<header class="relative z-50 pt-6 pb-3 px-4 md:px-8">
+  <nav class="relative mx-auto max-w-6xl flex items-center justify-between gap-4">
+    <a href="#" class="flex items-center gap-2.5">
+      <div class="h-8 w-8 rounded bg-white grid place-items-center text-slate-900 font-bold text-sm tracking-tight">A</div>
+      <span class="text-[15px] font-semibold tracking-tight">Advisens</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-[13px] text-white/70">
+      <a href="#demo" class="hover:text-white transition-colors duration-150">Live demo</a>
+      <a href="#agents" class="hover:text-white transition-colors duration-150">How it works</a>
+      <a href="#use-cases" class="hover:text-white transition-colors duration-150">Use cases</a>
+      <a href="#why" class="hover:text-white transition-colors duration-150">Why Advisens</a>
+      <a href="#pricing" class="hover:text-white transition-colors duration-150">Pricing</a>
+    </div>
+    <a href="#enquire" class="btn inline-block rounded-md bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-slate-900 hover:bg-slate-200">Enquire</a>
+  </nav>
+</header>
+
+<main class="relative">
+
+<!-- ============ HERO ============ -->
+<section class="relative px-4 md:px-8 pt-10 md:pt-20 pb-20 md:pb-28 border-b hairline overflow-hidden">
+  <!-- Subtle dot grid background -->
+  <div class="absolute inset-0 dot-grid opacity-60 pointer-events-none"></div>
+  <!-- Soft emerald glow top-left -->
+  <div class="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%); filter: blur(80px);"></div>
+
+  <div class="relative mx-auto max-w-6xl">
+
+    <div class="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-center">
+
+      <!-- Left: copy -->
+      <div>
+        <div class="eyebrow mb-8">
+          <span class="eyebrow-dot"></span>
+          For GCC &amp; international financial advisers
+        </div>
+
+        <h1 class="text-balance text-[42px] sm:text-[52px] md:text-[64px] lg:text-[72px] leading-[0.98] tracking-[-0.025em] text-white font-display">
+          Bespoke client reports,<br>
+          <span class="display-grad">automated end-to-end</span> —<br>
+          <em class="text-white/55 italic">in your firm's voice.</em>
+        </h1>
+
+        <p class="mt-7 max-w-xl text-[15px] sm:text-base text-white/70 leading-relaxed">
+          Advisens learns the structure, language, and product universe of your existing reports.
+          Upload an assessment, review pack, or pitch document once — and every future client
+          report is pre-populated, fact-checked, and ready to ship in minutes, not days.
+        </p>
+
+        <div class="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <a href="#demo" class="btn group inline-flex items-center gap-2 rounded-md bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-emerald-400 shadow-lg shadow-emerald-900/30">
+            See the live demo
+            <svg viewBox="0 0 24 24" class="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#enquire" class="btn inline-flex items-center gap-2 rounded-md border hairline bg-white/[0.03] px-5 py-3 text-sm font-medium text-white hover:bg-white/[0.06]">Enquire</a>
+        </div>
+
+        <!-- Inline credibility ticks -->
+        <div class="mt-9 flex items-center gap-6 text-[11px] text-white/45">
+          <div class="flex items-center gap-1.5">
+            <svg class="h-3 w-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>SOC 2 Type II</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg class="h-3 w-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>GDPR &amp; PDPL compliant</span>
+          </div>
+          <div class="flex items-center gap-1.5 hidden sm:flex">
+            <svg class="h-3 w-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Your data, your model</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Visual preview (auto-cycling) -->
+      <div class="relative" id="heroPreview">
+        <!-- Glow behind -->
+        <div class="absolute -inset-4 rounded-2xl pointer-events-none" style="background: radial-gradient(circle at 60% 40%, rgba(16,185,129,0.18), transparent 70%); filter: blur(50px);"></div>
+
+        <!-- Floating preview card -->
+        <div class="relative rounded-xl border hairline bg-white/[0.02] overflow-hidden shadow-2xl shadow-black/40">
+
+          <!-- Window chrome -->
+          <div class="border-b hairline px-4 py-2.5 bg-white/[0.02] flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <div class="h-2 w-2 rounded-full bg-white/15"></div>
+              <div class="h-2 w-2 rounded-full bg-white/15"></div>
+              <div class="h-2 w-2 rounded-full bg-white/15"></div>
+              <span class="ml-2 text-[10px] text-white/40 font-mono">advisens / live</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 font-mono num flex items-center gap-1.5">
+              <span class="h-1 w-1 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="heroPagePill">page 09 / 47</span>
+            </span>
+          </div>
+
+          <!-- Document body — auto cycles -->
+          <div id="heroPreviewBody" class="bg-white text-slate-900 min-h-[320px] relative">
+            <!-- Filled by JS -->
+          </div>
+
+          <!-- Page indicator dots -->
+          <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" id="heroDots">
+          </div>
+        </div>
+
+        <!-- Floating stat pill -->
+        <div class="hidden lg:flex absolute -bottom-4 -left-6 items-center gap-2.5 rounded-full border hairline bg-[#0f1623] px-4 py-2 shadow-xl shadow-black/40">
+          <div class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span class="text-[11px] text-white font-mono num">Built in 14.0s · 47 pages</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06] rounded border hairline overflow-hidden">
+      <div class="bg-[#0a0e16] p-6">
+        <div class="text-[28px] sm:text-[32px] font-display tracking-tight text-white leading-none" data-count="90" data-prefix="~" data-decimals="0">~90<span class="text-emerald-400">%</span></div>
+        <div class="mt-2 text-[11px] text-white/55 leading-relaxed">of report build time recovered for client work</div>
+      </div>
+      <div class="bg-[#0a0e16] p-6">
+        <div class="text-[28px] sm:text-[32px] font-display tracking-tight text-white leading-none" data-count="4" data-suffix=" agents">4 agents</div>
+        <div class="mt-2 text-[11px] text-white/55 leading-relaxed">specialist roles, in parallel, in your template</div>
+      </div>
+      <div class="bg-[#0a0e16] p-6">
+        <div class="text-[28px] sm:text-[32px] font-display tracking-tight text-white leading-none italic">Your IP</div>
+        <div class="mt-2 text-[11px] text-white/55 leading-relaxed">your template, voice, product universe, never replaced</div>
+      </div>
+      <div class="bg-[#0a0e16] p-6">
+        <div class="text-[28px] sm:text-[32px] font-display tracking-tight text-white leading-none italic">Smarter</div>
+        <div class="mt-2 text-[11px] text-white/55 leading-relaxed">every report you ship trains the agents</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ WORKFLOW ============ -->
+<section class="px-4 md:px-8 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-14 flex items-end justify-between flex-wrap gap-6">
+      <div class="max-w-2xl">
+        <div class="eyebrow mb-4">
+          <span class="eyebrow-dot"></span>
+          01 — Workflow
+        </div>
+        <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+          Your reports. Your protocol. <em class="text-white/55 italic">Faster.</em>
+        </h2>
+      </div>
+      <p class="max-w-md text-[14px] text-white/65 leading-relaxed">
+        Advisens is not a report generator. It is a layer that sits over the reports you already
+        produce — and removes the manual stitching between meeting, recommendation, and delivery.
+      </p>
+    </div>
+
+    <div class="relative grid md:grid-cols-3 gap-px bg-white/[0.06] rounded border hairline overflow-hidden">
+
+      <!-- Subtle connecting line on desktop -->
+      <div class="absolute hidden md:block left-0 right-0 top-[88px] h-px pointer-events-none" style="background: linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.15) 20%, rgba(16,185,129,0.15) 80%, transparent 100%);"></div>
+
+      <div class="relative bg-[#0a0e16] p-8 card-lift" data-workflow-step>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="num-badge font-display">01</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] text-white/45 font-semibold">Setup · once</div>
+        </div>
+        <h3 class="text-[20px] font-display text-white mb-3 leading-tight">Upload your templates</h3>
+        <p class="text-[13px] text-white/65 leading-relaxed">Your firm's assessment report, review pack, and introductory document. Advisens reads them, learns the section structure, your voice, and the products you actually recommend.</p>
+        <div class="mt-5 flex flex-wrap gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Keynote</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Word</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">PDF</span>
+        </div>
+      </div>
+
+      <div class="relative bg-[#0a0e16] p-8 card-lift" data-workflow-step>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="num-badge font-display">02</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] text-white/45 font-semibold">Per client meeting</div>
+        </div>
+        <h3 class="text-[20px] font-display text-white mb-3 leading-tight">Run your meeting</h3>
+        <p class="text-[13px] text-white/65 leading-relaxed">Fireflies, Otter, Read.ai, or your own typed notes. Advisens ingests the meeting context and matches it against your previous reports — so recommendations stay consistent with the work your firm has signed off on before.</p>
+        <div class="mt-5 flex flex-wrap gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Fireflies</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Read.ai</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Otter</span>
+        </div>
+      </div>
+
+      <div class="relative bg-[#0a0e16] p-8 card-lift" data-workflow-step>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="num-badge font-display">03</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] text-white/45 font-semibold">Ship same-day</div>
+        </div>
+        <h3 class="text-[20px] font-display text-white mb-3 leading-tight">Ship the report</h3>
+        <p class="text-[13px] text-white/65 leading-relaxed">A populated, fact-checked, on-brand report in your template — ready for adviser review. You edit, you sign off, you deliver. The agents handle the heavy lifting in between.</p>
+        <div class="mt-5 flex flex-wrap gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">PDF</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Keynote</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">Word</span>
+          <span class="text-[10px] uppercase tracking-wider text-white/45 border hairline rounded-full px-2 py-0.5">CRM sync</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIVE DEMO ============ -->
+<section id="demo" class="px-3 md:px-6 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto" style="max-width: min(1640px, 100%);">
+    <div class="mb-10 flex items-end justify-between flex-wrap gap-6">
+      <div class="max-w-2xl">
+        <div class="eyebrow mb-4">
+          <span class="eyebrow-dot"></span>
+          02 — Live demonstration
+        </div>
+        <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+          A 47-page bespoke report,<br>
+          <em class="italic text-white/55">built end-to-end in ~14 seconds.</em>
+        </h2>
+        <p class="mt-4 text-[14px] text-white/65 leading-relaxed">
+          Fictional discovery call &middot; ingested through Fireflies &middot; populated into an
+          uploaded firm template &middot; reviewed by four specialist agents &middot; ready for adviser sign-off.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="pauseDemo" class="btn hidden inline-flex items-center gap-2 rounded-md border hairline bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08]">
+          <span id="pauseIcon"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></span>
+          <span id="pauseLabel">Pause</span>
+        </button>
+        <button id="runDemo" class="btn inline-flex items-center gap-2 rounded-md bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed">
+          <span id="playIcon"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 21 12 6 21 6 3"/></svg></span>
+          <span id="runLabel">Run demo</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-3 flex items-center gap-2 text-[11px] text-white/55">
+      <svg class="h-3.5 w-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span><span class="text-white/80">Template loaded:</span> firm-bespoke-assessment-v3.template &middot; <span class="text-white/40">indexed on 142 prior reports &middot; trained on adviser voice &middot; product universe synced</span></span>
+    </div>
+
+    <div class="rounded-lg border hairline bg-[#0d121d] overflow-hidden doc">
+      <!-- Window chrome -->
+      <div class="flex items-center justify-between border-b hairline px-5 py-3 bg-white/[0.02]">
+        <div class="flex items-center gap-2.5">
+          <div class="h-2.5 w-2.5 rounded-full bg-white/15"></div>
+          <div class="h-2.5 w-2.5 rounded-full bg-white/15"></div>
+          <div class="h-2.5 w-2.5 rounded-full bg-white/15"></div>
+          <span class="ml-3 text-[11px] text-white/45 font-mono">advisens / report-engine</span>
+        </div>
+        <div class="flex items-center gap-4 text-[11px] text-white/45">
+          <span class="font-mono num" id="elapsedTicker">00:00</span>
+          <span class="hidden sm:inline">|</span>
+          <span class="hidden sm:inline num">Pages built: <span id="pagesBuiltCount">0</span> / 47</span>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-[240px_220px_minmax(0,1fr)] divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+
+        <!-- Input -->
+        <div class="p-5 max-h-[820px] overflow-y-auto">
+          <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45 mb-3">Input · Discovery call</div>
+          <pre class="text-[11px] leading-[1.7] text-white/72 font-mono whitespace-pre-wrap">DISCOVERY CALL &middot; 22 May 2026
+Captured via Fireflies &middot; 53 min
+
+CLIENT
+James Whitlock-Bryant, 45
+British &middot; KSA resident since 2020
+Visa: KSA employment + UAE Golden
+Director, Infrastructure Investments
+Public Investment Fund (Riyadh)
+
+SPOUSE
+Caroline Whitlock-Bryant, 42
+British &middot; ex Allen &amp; Overy lawyer
+Not currently working
+
+DEPENDENTS
+3 children &middot; ages 7, 10, 13
+All at British International
+School Riyadh (BISR)
+School fees ~SAR 285k / year
+
+INCOME (monthly)
+PIF salary             SAR 145,000
+Avg bonus              SAR  60,000
+Living costs          -SAR  38,000
+Surplus                SAR 167,000
+
+ASSETS
+Cash Riyad Bank        SAR 280,000
+Cash NatWest UK        GBP  88,000
+Cash Emirates NBD      AED 215,000
+   (DMCC freezone biz)
+KSA EOSB accrued       SAR 1,200,000
+PIF DC pension         SAR 580,000
+UK Surrey home         GBP 950,000
+   &middot; mortgage          GBP 420,000
+   &middot; rented (£4,200/m)
+UK Clapham BTL         GBP 580,000
+   &middot; mortgage          GBP 180,000
+   &middot; rented (£2,400/m)
+UK Aviva (frozen)      GBP 145,000
+UK ISA Vanguard (frzn) GBP  78,000
+
+STRUCTURE
+DMCC freezone company
+   (occasional consulting)
+UAE Golden Visa via DMCC
+
+PROTECTION
+Life cover  3&times; salary (PIF)
+Critical ill.  none
+UK will  drafted 2017, stale
+KSA will  none
+UAE wasiya  none
+
+GOALS (client's words)
+1. "Return to UK in 2031,
+    cleanly, with kids settled"
+2. "EOSB is just sat there"
+3. "Worried about UK tax position
+    on return"
+4. "Too cash-heavy, want growth"
+5. "Caroline's NI restart on UK
+    return needs sorting"
+6. "School fees in UK will be
+    £75k+ a year from 2031"
+
+CONCERNS
+"5 years feels like nothing.
+We've not really planned."
+"PIF gratuity is the wildcard."
+
+RISK PROFILE
+ATR completed: Balanced-Growth
+
+REPORT TEMPLATE
+firm-bespoke-assessment-v3 (47 pages)
+&middot; cover &middot; team &middot; firm credentials
+&middot; client class &middot; asset overview
+&middot; retirement math &middot; UK tax bands
+&middot; KSA EOSB analysis &middot; platform
+&middot; illustration &middot; philosophy
+&middot; market outlook &middot; team
+&middot; risk mandates &middot; MPS returns
+&middot; GBP/USD MPS &middot; holdings
+&middot; portfolio changes &middot; fees
+&middot; compliance &middot; timeline
+&middot; servicing &middot; sign-off</pre>
+        </div>
+
+        <!-- Agents -->
+        <div class="p-5">
+          <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45 mb-3">Agents</div>
+          <div class="space-y-2.5" id="agentList"></div>
+          <div id="completeBanner" class="hidden mt-5 border-t hairline pt-4 text-[11px] text-white/65">
+            <div class="flex items-center gap-2 font-semibold text-emerald-300 mb-1.5">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="text-white">Report ready for adviser review</span>
+            </div>
+            <div class="text-white/50 num text-[10.5px] leading-relaxed mb-3">
+              Built in <span id="elapsed">14.0</span>s &middot; 47 pages &middot; 20 visual layouts shown &middot; trained on 142 prior reports
+            </div>
+            <div class="flex gap-1.5 flex-wrap">
+              <button class="text-[10px] font-medium rounded border hairline bg-white/[0.03] px-2 py-1 hover:bg-white/[0.08] transition-colors">Export PDF</button>
+              <button class="text-[10px] font-medium rounded border hairline bg-white/[0.03] px-2 py-1 hover:bg-white/[0.08] transition-colors">Export Keynote</button>
+              <button class="text-[10px] font-medium rounded border hairline bg-white/[0.03] px-2 py-1 hover:bg-white/[0.08] transition-colors">Send to CRM</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output document -->
+        <div class="bg-white text-slate-900 flex flex-col relative" style="min-height: 820px;">
+          <!-- Document chrome -->
+          <div class="border-b border-slate-200 px-6 py-3 flex items-center justify-between text-[10px] text-slate-500 bg-white shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="font-semibold tracking-[0.18em] uppercase text-[10px] text-slate-700">Bespoke Wealth Assessment</div>
+              <span class="hidden sm:inline opacity-0 transition-opacity duration-500 mono-num" id="docMeta">28 May 2026 &middot; AD-2026-1042 &middot; J. Whitlock-Bryant</span>
+            </div>
+            <span id="pageCounter" class="font-mono num">— / 47</span>
+          </div>
+
+          <!-- Page tabs -->
+          <div class="border-b border-slate-200 px-2 py-1.5 bg-white flex gap-0.5 overflow-x-auto shrink-0" id="pageTabs"></div>
+
+          <!-- Page body -->
+          <div id="reportIdle" class="px-8 py-20 text-center flex-1 grid place-items-center">
+            <div>
+              <div class="text-xs text-slate-400 uppercase tracking-[0.18em] mb-2">Awaiting agents</div>
+              <div class="text-sm text-slate-600">Press <span class="font-semibold">Run demo</span> to populate the template.</div>
+            </div>
+          </div>
+
+          <div id="reportBody" class="hidden flex-1 relative overflow-y-auto doc-page"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3 text-[11px] text-white/40 leading-relaxed">
+      <svg class="h-3 w-3 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Demonstration content. Client data, recommendations and figures are synthesised for a fictional case. After demo completes, click any page tab to browse.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOUR AGENTS (BENTO) ============ -->
+<section id="agents" class="px-4 md:px-8 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-14 flex items-end justify-between flex-wrap gap-6">
+      <div class="max-w-2xl">
+        <div class="eyebrow mb-4">
+          <span class="eyebrow-dot"></span>
+          03 — Architecture
+        </div>
+        <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+          Four specialist agents.<br>
+          <em class="text-white/55 italic">One coherent document.</em>
+        </h2>
+      </div>
+      <p class="max-w-md text-[14px] text-white/65 leading-relaxed">
+        Each agent has a single specialty and hands off to the next. Output stays consistent
+        across a 50-page document because the orchestration is deterministic, not chat-based.
+      </p>
+    </div>
+
+    <!-- Bento grid: 3 cols, mixed sizes -->
+    <div class="grid md:grid-cols-3 gap-3">
+
+      <!-- Discovery — large card (2 cols) -->
+      <div class="md:col-span-2 relative rounded border hairline bg-[#0a0e16] p-8 card-lift overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%); filter: blur(20px);"></div>
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-lg grid place-items-center" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25)">
+              <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-emerald-400/80 font-semibold">Agent 01 · Ingestion</div>
+              <h3 class="text-[20px] font-display text-white leading-tight">Discovery agent</h3>
+            </div>
+          </div>
+          <p class="text-[13.5px] text-white/72 leading-relaxed max-w-2xl">Reads the meeting — whether captured by Fireflies, Read.ai, Otter, or your own typed notes. Extracts the fact find, stated goals, the implicit concerns, household composition, and any specific instructions the adviser gave mid-call. Structures it as a profile ready for downstream agents.</p>
+          <div class="mt-6 grid grid-cols-3 gap-3 max-w-md">
+            <div class="text-center border hairline rounded px-2 py-2">
+              <div class="text-[11px] text-emerald-400 font-mono font-semibold">~80%</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-0.5">recall</div>
+            </div>
+            <div class="text-center border hairline rounded px-2 py-2">
+              <div class="text-[11px] text-emerald-400 font-mono font-semibold">12 sources</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-0.5">supported</div>
+            </div>
+            <div class="text-center border hairline rounded px-2 py-2">
+              <div class="text-[11px] text-emerald-400 font-mono font-semibold">2 sec</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-0.5">ingest time</div>
+            </div>
+          </div>
+          <div class="mt-5 text-[10.5px] text-white/40">Fireflies &middot; Read.ai &middot; Otter &middot; plain text &middot; PDF upload &middot; voice memo</div>
+        </div>
+      </div>
+
+      <!-- Profile — single col -->
+      <div class="relative rounded border hairline bg-[#0a0e16] p-7 card-lift overflow-hidden">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-lg grid place-items-center" style="background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25)">
+            <svg class="w-4 h-4 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.18em] text-purple-300/80 font-semibold">Agent 02</div>
+            <h3 class="text-[16px] font-display text-white leading-tight">Profile agent</h3>
+          </div>
+        </div>
+        <p class="text-[13px] text-white/65 leading-relaxed">Cross-references the meeting against your firm's prior reports. Identifies which sections of your template need the most attention. Flags ambiguity for adviser confirmation before drafting.</p>
+        <div class="mt-4 pt-4 border-t hairline">
+          <div class="text-[10.5px] text-white/40">structured profile &middot; section priorities &middot; clarification flags</div>
+        </div>
+      </div>
+
+      <!-- Template — single col -->
+      <div class="relative rounded border hairline bg-[#0a0e16] p-7 card-lift overflow-hidden">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-lg grid place-items-center" style="background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.30)">
+            <svg class="w-4 h-4 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.18em] text-amber-300/80 font-semibold">Agent 03</div>
+            <h3 class="text-[16px] font-display text-white leading-tight">Template agent</h3>
+          </div>
+        </div>
+        <p class="text-[13px] text-white/65 leading-relaxed">Populates your firm's template — the same one you uploaded. Writes in your voice and structure. Recommendations come from your firm's approved universe, not external lookups.</p>
+        <div class="mt-4 pt-4 border-t hairline">
+          <div class="text-[10.5px] text-white/40">Word &middot; Keynote &middot; PDF &middot; PowerPoint</div>
+        </div>
+      </div>
+
+      <!-- Verification — large card (2 cols) -->
+      <div class="md:col-span-2 relative rounded border hairline bg-[#0a0e16] p-8 card-lift overflow-hidden">
+        <div class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(244,63,94,0.10), transparent 70%); filter: blur(20px);"></div>
+        <div class="relative grid md:grid-cols-[1fr_auto] gap-6 items-start">
+          <div>
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-lg grid place-items-center" style="background: rgba(244,63,94,0.10); border: 1px solid rgba(244,63,94,0.25)">
+                <svg class="w-5 h-5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase tracking-[0.18em] text-rose-400/80 font-semibold">Agent 04 · Review</div>
+                <h3 class="text-[20px] font-display text-white leading-tight">Verification agent</h3>
+              </div>
+            </div>
+            <p class="text-[13.5px] text-white/72 leading-relaxed max-w-xl">Final pass for numerical consistency across the document, typo detection, disclosure language compliance with the regulator in the client's jurisdiction, and adherence to the firm-specific style your prior reports established.</p>
+            <div class="mt-5 text-[10.5px] text-white/40">SCA &middot; FCA &middot; DFSA &middot; FSRA &middot; firm style adherence</div>
+          </div>
+          <!-- Confidence score viz -->
+          <div class="hidden md:block w-32 shrink-0">
+            <div class="text-[10px] uppercase tracking-[0.18em] text-white/40 mb-2 text-right">Confidence</div>
+            <svg viewBox="0 0 120 120" class="w-32 h-32">
+              <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="none"/>
+              <circle cx="60" cy="60" r="48" stroke="#34d399" stroke-width="8" fill="none" stroke-dasharray="301.6" stroke-dashoffset="48" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <text x="60" y="62" text-anchor="middle" fill="#fff" font-family="Instrument Serif" font-size="22" dominant-baseline="middle">98<tspan font-size="14" fill="#94a3b8">%</tspan></text>
+              <text x="60" y="82" text-anchor="middle" fill="#94a3b8" font-family="Inter" font-size="7" letter-spacing="2">FACT CHECKED</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ USE CASES (BENTO) ============ -->
+<section id="use-cases" class="px-4 md:px-8 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-14 flex items-end justify-between flex-wrap gap-6">
+      <div class="max-w-2xl">
+        <div class="eyebrow mb-4">
+          <span class="eyebrow-dot"></span>
+          04 — Use cases
+        </div>
+        <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+          Not just <em class="italic text-white/55">new business.</em>
+        </h2>
+      </div>
+      <p class="max-w-md text-[14px] text-white/65 leading-relaxed">
+        Every document you currently produce by hand — automated. Advisens stores, learns
+        from, and upgrades the entire body of work your firm ships.
+      </p>
+    </div>
+
+    <!-- Bento grid: 4-up with two highlighted cards -->
+    <div class="grid md:grid-cols-3 gap-3">
+
+      <!-- New assessment — featured card spanning 2 cols -->
+      <div class="md:col-span-2 relative rounded border hairline bg-gradient-to-br from-emerald-500/[0.08] to-[#0a0e16] p-8 card-lift overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%); filter: blur(30px);"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-5">
+            <span class="text-[10px] uppercase tracking-[0.18em] text-emerald-400/80 font-semibold">Most common</span>
+            <span class="pill-time inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono num font-semibold" style="background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.25)">2 hrs → 10 min</span>
+          </div>
+          <h3 class="text-[26px] font-display text-white mb-3 leading-tight">New client assessment reports</h3>
+          <p class="text-[13.5px] text-white/72 leading-relaxed max-w-xl">Full bespoke assessment from a single discovery call. Profile, gap analysis, DC pension review, recommendations, portfolio composition, fees, compliance — populated in your template, ready for adviser sign-off the same day.</p>
+
+          <div class="mt-7 grid grid-cols-3 gap-3 max-w-sm">
+            <div>
+              <div class="text-[20px] font-display text-white leading-none">47</div>
+              <div class="text-[10px] uppercase tracking-wider text-white/45 mt-1">pages built</div>
+            </div>
+            <div>
+              <div class="text-[20px] font-display text-white leading-none">10</div>
+              <div class="text-[10px] uppercase tracking-wider text-white/45 mt-1">minutes</div>
+            </div>
+            <div>
+              <div class="text-[20px] font-display text-emerald-400 leading-none">92%</div>
+              <div class="text-[10px] uppercase tracking-wider text-white/45 mt-1">time saved</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review packs — single col -->
+      <div class="relative rounded border hairline bg-[#0a0e16] p-7 card-lift overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-9 h-9 rounded-lg grid place-items-center" style="background: rgba(129,140,248,0.12); border: 1px solid rgba(129,140,248,0.25)">
+            <svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <span class="text-[10px] text-indigo-300/70 uppercase tracking-wider font-mono num">3hr → 15min</span>
+        </div>
+        <h3 class="text-[18px] font-display text-white mb-2 leading-tight">Annual &amp; quarterly review packs</h3>
+        <p class="text-[12.5px] text-white/65 leading-relaxed">Pulls the last review, updates valuations, refreshes the fact find against flagged changes, refreshes portfolio commentary. Generates a side-by-side delta since the last review.</p>
+      </div>
+
+      <!-- Pitch docs — single col -->
+      <div class="relative rounded border hairline bg-[#0a0e16] p-7 card-lift overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-9 h-9 rounded-lg grid place-items-center" style="background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.30)">
+            <svg class="w-4 h-4 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg>
+          </div>
+          <span class="text-[10px] text-amber-300/70 uppercase tracking-wider font-mono num">90min → 8min</span>
+        </div>
+        <h3 class="text-[18px] font-display text-white mb-2 leading-tight">Introductory pitch documents</h3>
+        <p class="text-[12.5px] text-white/65 leading-relaxed">Tailored to industry, nationality, jurisdiction of residence, family composition, and stated wealth bracket. No generic decks across every meeting.</p>
+      </div>
+
+      <!-- Recreated — single col -->
+      <div class="relative rounded border hairline bg-[#0a0e16] p-7 card-lift overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-9 h-9 rounded-lg grid place-items-center" style="background: rgba(244,63,94,0.10); border: 1px solid rgba(244,63,94,0.25)">
+            <svg class="w-4 h-4 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </div>
+          <span class="text-[10px] text-rose-400/70 uppercase tracking-wider font-mono num">60pg → 12min</span>
+        </div>
+        <h3 class="text-[18px] font-display text-white mb-2 leading-tight">Recreated &amp; repurposed reports</h3>
+        <p class="text-[12.5px] text-white/65 leading-relaxed">Take any existing report in your library and rebuild it for a new client profile. Same depth, same structure, new specifics.</p>
+      </div>
+
+      <!-- Library — featured card spanning 2 cols -->
+      <div class="md:col-span-2 relative rounded border hairline bg-gradient-to-bl from-amber-500/[0.06] to-[#0a0e16] p-8 card-lift overflow-hidden">
+        <div class="absolute -left-16 -bottom-16 w-48 h-48 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(251,191,36,0.10), transparent 70%); filter: blur(30px);"></div>
+        <div class="relative grid md:grid-cols-[1fr_auto] gap-6 items-end">
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.18em] text-amber-300/80 mb-3 font-semibold">Your firm's library — intelligent</div>
+            <h3 class="text-[22px] font-display text-white mb-3 leading-tight">Every report you've shipped, <em class="italic text-white/55">indexed and ready to redeploy.</em></h3>
+            <p class="text-[13px] text-white/65 leading-relaxed max-w-xl">Advisens stores every document the agents produce — and every existing one you upload. The more your firm uses it, the more the agents learn your house style.</p>
+          </div>
+          <div class="grid grid-cols-3 gap-2 shrink-0 max-w-[300px]">
+            <div class="border hairline rounded p-3 bg-white/[0.02]">
+              <div class="text-[22px] font-display text-white leading-none">142</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-1.5">assessments</div>
+            </div>
+            <div class="border hairline rounded p-3 bg-white/[0.02]">
+              <div class="text-[22px] font-display text-white leading-none">68</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-1.5">reviews</div>
+            </div>
+            <div class="border hairline rounded p-3 bg-white/[0.02]">
+              <div class="text-[22px] font-display text-white leading-none">21</div>
+              <div class="text-[9px] uppercase tracking-wider text-white/45 mt-1.5">pitches</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ADVISENS ============ -->
+<section id="why" class="px-4 md:px-8 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto max-w-5xl">
+    <div class="mb-14">
+      <div class="eyebrow mb-4">
+        <span class="eyebrow-dot"></span>
+        05 — Why Advisens
+      </div>
+      <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+        <em class="italic text-white/55">&ldquo;</em>Why can't I just use ChatGPT?<em class="italic text-white/55">&rdquo;</em>
+      </h2>
+      <p class="mt-4 text-[14px] text-white/65 max-w-2xl leading-relaxed">A reasonable question. The honest answer is that an LLM and a multi-agent report platform built for advisory work are not in the same category.</p>
+    </div>
+
+    <!-- Anchor argument -->
+    <div class="rounded border hairline bg-white/[0.02] p-7 mb-3">
+      <div class="grid md:grid-cols-[1.2fr_1fr] gap-8 items-start">
+        <div>
+          <div class="eyebrow mb-3"><span class="eyebrow-dot"></span>The anchor argument</div>
+          <h3 class="text-[24px] md:text-[28px] font-display leading-[1.15] text-white max-w-xl">
+            Your report is your <em class="italic text-white/55">infrastructure.</em> It is what sells you.
+          </h3>
+          <p class="mt-4 text-[14px] text-white/65 leading-relaxed max-w-xl">
+            Two advisers, same prospect, same discovery meeting. By coincidence both arrive at the same recommendation. The prospect now decides on two things: who did they get on with, and whose work landed better when it hit the table. The adviser running ChatGPT cut and paste will not touch the sides of the adviser running four specialist agents that improve every single time they ship.
+          </p>
+        </div>
+        <div class="rounded border hairline bg-[#0d121d] p-5">
+          <div class="text-[11px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold">Win one client. Cover the year.</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[12.5px] num">
+            <div class="text-white/60">Advisens (Solo plan)</div><div class="text-right text-white">AED 599 / mo</div>
+            <div class="text-white/60">Annual cost</div><div class="text-right text-white">AED 7,188</div>
+            <div class="text-white/60 col-span-2 hr-dotted my-2"></div>
+            <div class="text-white/60">Avg new GCC client commission &amp; AUA (yr 1)</div><div class="text-right text-white">AED 18,000 to 60,000</div>
+            <div class="text-emerald-300 font-semibold col-span-2 mt-2">One additional client funds Advisens for a full year. Every retained, won, or rebuilt client after that is profit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-3">
+
+      <!-- ChatGPT panel -->
+      <div class="rounded border hairline bg-[#0a0e16] p-7">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded grid place-items-center bg-white/[0.04] border hairline">
+            <svg class="w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><line x1="6" y1="10" x2="6" y2="15"/><line x1="10" y1="10" x2="10" y2="15"/><line x1="14" y1="10" x2="14" y2="15"/><line x1="18" y1="10" x2="18" y2="15"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.18em] text-white/40 font-semibold">Option A</div>
+            <h3 class="text-[17px] font-display text-white leading-tight">Generic LLM, manual stitching</h3>
+          </div>
+        </div>
+        <p class="text-[13px] text-white/65 leading-relaxed mb-5">A single chat window with no memory of your firm. You type "rewrite this section with these new client details," paste, format, fact check, hope the disclosure language is right. Next prospect, you repeat the entire exercise from scratch.</p>
+        <ul class="space-y-2.5 text-[12.5px] text-white/65">
+          <li class="flex items-start gap-2.5"><span class="text-white/30 mt-0.5">·</span><span><span class="text-white">The report stays at the same quality level forever.</span> No compounding improvement, just copy and paste.</span></li>
+          <li class="flex items-start gap-2.5"><span class="text-white/30 mt-0.5">·</span><span><span class="text-white">Every output is a one off.</span> The voice drifts, structure varies, language slips between reports.</span></li>
+          <li class="flex items-start gap-2.5"><span class="text-white/30 mt-0.5">·</span><span><span class="text-white">No firm context.</span> You can paste your template, but the LLM has no memory of the 100+ other reports you have shipped.</span></li>
+          <li class="flex items-start gap-2.5"><span class="text-white/30 mt-0.5">·</span><span><span class="text-white">Disclosures are at the operator's discretion.</span> A general model will skip, paraphrase, or fabricate regulatory wording.</span></li>
+          <li class="flex items-start gap-2.5"><span class="text-white/30 mt-0.5">·</span><span><span class="text-white">Your clients never see you improving.</span> The materials look the same as they did a year ago.</span></li>
+        </ul>
+      </div>
+
+      <!-- Advisens panel -->
+      <div class="rounded border bg-[#0a0e16] p-7" style="border-color: rgba(16,185,129,0.30)">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded grid place-items-center" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25)">
+            <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.18em] text-emerald-400/80 font-semibold">Option B</div>
+            <h3 class="text-[17px] font-display text-white leading-tight">Advisens, four agents working together</h3>
+          </div>
+        </div>
+        <p class="text-[13px] text-white/72 leading-relaxed mb-5">A specialist orchestration designed only for advisory work. Discovery, Profile, Template and Verification agents hand off automatically, each one carrying your firm's voice and product universe. Every report you ship makes the next one better.</p>
+        <ul class="space-y-2.5 text-[12.5px] text-white/72">
+          <li class="flex items-start gap-2.5"><svg class="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span class="text-white font-medium">Quality compounds with use.</span> The agents learn your structure, recommendation patterns, and house style every time you ship.</span></li>
+          <li class="flex items-start gap-2.5"><svg class="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span class="text-white font-medium">Consistency across the whole library.</span> Voice, structure, numeric cross references, disclosure language, all locked.</span></li>
+          <li class="flex items-start gap-2.5"><svg class="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span class="text-white font-medium">Fact checked by a dedicated agent.</span> Numbers reconciled across sections, typos flagged, regulator specific wording verified.</span></li>
+          <li class="flex items-start gap-2.5"><svg class="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span class="text-white font-medium">Your IP, in your firm's product universe.</span> Recommendations only ever come from products your firm has signed off on.</span></li>
+          <li class="flex items-start gap-2.5"><svg class="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span class="text-white font-medium">Adviser time, recovered.</span> Paraplanners and advisers spend less on report mechanics, more on client work.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing" class="px-4 md:px-8 py-20 md:py-28 border-b hairline">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-14">
+      <div class="eyebrow mb-4">
+        <span class="eyebrow-dot"></span>
+        06 — Pricing
+      </div>
+      <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+        Simple, per-seat. <em class="italic text-white/55">Bill the firm or the adviser.</em>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-px bg-white/[0.06]">
+      <div class="bg-[#0a0e16] p-7">
+        <h3 class="text-base font-semibold text-white">Solo</h3>
+        <p class="mt-1 text-xs text-white/55">Independent adviser</p>
+        <div class="mt-6 flex items-baseline gap-1.5"><span class="text-3xl font-semibold text-white num">AED 599</span><span class="text-xs text-white/45">/ month / seat</span></div>
+        <ul class="mt-7 space-y-2.5 text-[13px] text-white/72">
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>1 adviser seat</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 25 reports / month</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Upload your firm's templates</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Read.ai, Fireflies, Otter integrations</span></li>
+        </ul>
+        <a href="#enquire" class="btn mt-8 inline-block rounded-md border hairline bg-white/[0.04] px-4 py-2 text-sm font-medium text-white hover:bg-white/[0.08]">Join now</a>
+      </div>
+      <div class="bg-[#0a0e16] p-7 relative">
+        <div class="absolute top-7 right-7 text-[10px] uppercase tracking-[0.18em] text-emerald-400/80">Most chosen</div>
+        <h3 class="text-base font-semibold text-white">Team</h3>
+        <p class="mt-1 text-xs text-white/55">Small firms — 2 to 10 advisers</p>
+        <div class="mt-6 flex items-baseline gap-1.5"><span class="text-3xl font-semibold text-white num">AED 1,499</span><span class="text-xs text-white/45">/ month / seat</span></div>
+        <ul class="mt-7 space-y-2.5 text-[13px] text-white/72">
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 10 adviser seats</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited reports</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Multi-template library</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Cross-adviser report library</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Admin dashboard &amp; audit log</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority onboarding support</span></li>
+        </ul>
+        <a href="#enquire" class="btn mt-8 inline-block rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400">Join now</a>
+      </div>
+      <div class="bg-[#0a0e16] p-7">
+        <h3 class="text-base font-semibold text-white">Firm</h3>
+        <p class="mt-1 text-xs text-white/55">Established firms — 10+ advisers</p>
+        <div class="mt-6 flex items-baseline gap-1.5"><span class="text-3xl font-semibold text-white">Custom</span></div>
+        <ul class="mt-7 space-y-2.5 text-[13px] text-white/72">
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited seats</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>White-label option</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>SSO + role-based access</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Firm-specific compliance rule set</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>CRM &amp; back-office integrations</span></li>
+          <li class="flex items-start gap-2"><svg class="h-3.5 w-3.5 text-emerald-400 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Dedicated onboarding manager</span></li>
+        </ul>
+        <a href="#enquire" class="btn mt-8 inline-block rounded-md border hairline bg-white/[0.04] px-4 py-2 text-sm font-medium text-white hover:bg-white/[0.08]">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ENQUIRE ============ -->
+<section id="enquire" class="px-4 md:px-8 py-20 md:py-28">
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-10 text-center">
+      <div class="eyebrow mb-4 justify-center inline-flex">
+        <span class="eyebrow-dot"></span>
+        07 — Enquire
+      </div>
+      <h2 class="text-[36px] md:text-[44px] leading-[1.05] tracking-[-0.02em] text-white font-display">
+        Tell us about <em class="italic text-white/55">your practice.</em>
+      </h2>
+      <p class="mt-4 text-[14px] text-white/65 max-w-xl mx-auto leading-relaxed">We are onboarding GCC and international advisory firms in batches. Send a brief and we will set up a 20-minute walkthrough — using one of your own report templates so you can see Advisens work on the document you actually ship.</p>
+    </div>
+
+    <form onsubmit="event.preventDefault(); alert('Thanks — placeholder form, not wired to a backend yet.')" class="rounded border hairline bg-white/[0.02] p-6">
+      <div class="grid sm:grid-cols-2 gap-3">
+        <input type="text" placeholder="Name" class="rounded-md border hairline bg-white/[0.03] px-4 py-2.5 text-sm placeholder:text-white/35 focus:border-emerald-400/40 focus:outline-none transition-colors duration-150" />
+        <input type="email" placeholder="Work email" class="rounded-md border hairline bg-white/[0.03] px-4 py-2.5 text-sm placeholder:text-white/35 focus:border-emerald-400/40 focus:outline-none transition-colors duration-150" />
+        <input type="text" placeholder="Firm" class="rounded-md border hairline bg-white/[0.03] px-4 py-2.5 text-sm placeholder:text-white/35 focus:border-emerald-400/40 focus:outline-none transition-colors duration-150" />
+        <input type="text" placeholder="Approx. adviser headcount" class="rounded-md border hairline bg-white/[0.03] px-4 py-2.5 text-sm placeholder:text-white/35 focus:border-emerald-400/40 focus:outline-none transition-colors duration-150" />
+      </div>
+      <textarea placeholder="What types of reports do you produce most? (assessment, review, pitch, other)" rows="3" class="mt-3 w-full rounded-md border hairline bg-white/[0.03] px-4 py-2.5 text-sm placeholder:text-white/35 focus:border-emerald-400/40 focus:outline-none transition-colors duration-150 resize-none"></textarea>
+      <button type="submit" class="btn mt-4 w-full rounded-md bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-emerald-400">Request a walkthrough</button>
+      <p class="mt-3 text-[11px] text-white/40 text-center">We reply within one business day. No marketing email — ever.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="px-4 md:px-8 py-10 border-t hairline">
+  <div class="mx-auto max-w-6xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[12px] text-white/45">
+    <div class="flex items-center gap-2.5">
+      <div class="h-6 w-6 rounded bg-white grid place-items-center text-slate-900 font-bold text-[11px]">A</div>
+      <span class="font-semibold text-white/75">Advisens</span>
+      <span class="text-white/30">&middot; prototype</span>
+    </div>
+    <div>The report intelligence layer for GCC &amp; international financial advisers.</div>
+  </div>
+</footer>
+
+</main>
+
+<!-- =================== DEMO JS =================== -->
+<script>
+
+const AGENTS = [
+  { id: 'discovery',    label: 'Discovery agent',    sub: 'Parsing the meeting',           startMs: 0,    speed: 6,
+    icon: '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>' },
+  { id: 'profile',      label: 'Profile agent',      sub: 'Cross-referencing prior work',  startMs: 900,  speed: 3.5,
+    icon: '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' },
+  { id: 'template',     label: 'Template agent',     sub: 'Populating your document',      startMs: 2500, speed: 1.8,
+    icon: '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' },
+  { id: 'verification', label: 'Verification agent', sub: 'Compliance + fact check',       startMs: 9500, speed: 5,
+    icon: '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>' },
+];
+
+/* ============================================================
+   PAGE RENDERERS — each is a self-contained visual layout
+============================================================ */
+
+const PAGES = [
+  /* ---------- 01 COVER ---------- */
+  {
+    n: 1, label: 'Cover', revealAt: 1200,
+    render: () => `
+      <div class="h-full relative doc-gradient" style="min-height: 720px">
+        <div class="absolute top-7 left-8 right-8 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="h-7 w-7 rounded-md bg-slate-900 grid place-items-center text-white font-bold text-xs tracking-tight">A</div>
+            <div>
+              <div class="text-[10px] font-semibold tracking-[0.22em] uppercase text-slate-700">[Your firm]</div>
+              <div class="text-[9px] uppercase tracking-[0.18em] text-slate-400 mt-0.5">Private Wealth Management</div>
+            </div>
+          </div>
+          <span class="text-[10px] uppercase tracking-[0.22em] text-slate-400 font-semibold mono-num">AD-2026-1042</span>
+        </div>
+
+        <div class="absolute inset-0 flex flex-col justify-center px-12">
+          <div class="stagger">
+            <div class="label" style="color:#64748b">Bespoke Wealth Assessment</div>
+            <div class="mt-1 label-dim" style="color:#94a3b8">Prepared for</div>
+            <h1 class="mt-5 text-[58px] font-semibold tracking-[-0.03em] leading-[0.95]" style="color:#0a0e16">James<br>Whitlock-Bryant</h1>
+            <div class="mt-7 flex items-center gap-3">
+              <div class="h-px w-12" style="background: var(--teal)"></div>
+              <div class="text-[12px] text-slate-700">Director, Infrastructure Investments &middot; Public Investment Fund</div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              <span class="pill pill-slate">British</span>
+              <span class="pill pill-slate">KSA resident · since 2020</span>
+              <span class="pill pill-teal">Returning UK · 2031</span>
+              <span class="pill pill-gold">UAE Golden Visa</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-7 left-8 right-8 flex items-end justify-between">
+          <div>
+            <div class="label-dim">Prepared</div>
+            <div class="text-[12px] font-medium text-slate-800 mt-0.5">28 May 2026</div>
+          </div>
+          <div class="text-right">
+            <div class="label-dim">Confidential</div>
+            <div class="text-[10px] text-slate-500 mt-0.5 italic">Not for distribution outside named recipient</div>
+          </div>
+        </div>
+
+        ${pageStamp(1)}
+      </div>
+    `,
+  },
+
+  /* ---------- 02 TEAM ---------- */
+  {
+    n: 2, label: 'Your team', revealAt: 2000,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Your dedicated advice team', '02')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">A four-person team supports every client engagement. You hold the relationship with your Private Wealth Director; the team handles execution, paraplanning, and administration.</p>
+
+        <div class="mt-6 doc-card stagger">
+          <div class="flex items-start gap-5">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 grid place-items-center text-white font-semibold text-[20px] shrink-0">OW</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="pill pill-teal">Lead adviser</span>
+                <span class="pill pill-slate">CISI Chartered</span>
+              </div>
+              <h3 class="mt-2 text-[18px] font-semibold">Oliver Whitfield</h3>
+              <div class="text-[11px] text-teal-700 uppercase tracking-wider font-semibold mt-0.5">Private Wealth Director</div>
+              <p class="text-[12px] text-slate-600 mt-2.5 leading-relaxed">12 years working with international clients on a one to one basis. Core focus on retirement and legacy planning for expatriate professionals across the GCC, with cross jurisdictional expertise in UK, US, and Australian regimes.</p>
+              <div class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[10.5px] text-slate-500 mono-num">
+                <span>+971 50 248 9170</span>
+                <span>oliver.whitfield@firm.com</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-3 gap-3 stagger">
+          ${[
+            ['JH', 'James Hartwell', 'Associate',             'Cashflow modelling, investment analysis, 4 yrs GCC advisory'],
+            ['SC', 'Sarah Caldwell', 'Paraplanner',           'Portfolio construction, report drafting, 5 yrs international'],
+            ['HV', 'Helena Voss',    'Executive Administrator','KYC, onboarding, ongoing client servicing'],
+          ].map(([init, name, role, bio], i) => `
+            <div class="doc-card">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-9 h-9 rounded-full grid place-items-center text-white font-semibold text-[12px] shrink-0" style="background: ${['#0d9488','#b45309','#475569'][i]}">${init}</div>
+                <div class="min-w-0">
+                  <div class="text-[12px] font-semibold leading-tight">${name}</div>
+                  <div class="text-[9.5px] uppercase tracking-wider text-slate-500 mt-0.5">${role}</div>
+                </div>
+              </div>
+              <p class="text-[10.5px] text-slate-600 leading-relaxed">${bio}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        ${pageFooter(2)}
+      </div>
+    `,
+  },
+
+  /* ---------- 03 WHY [FIRM] ---------- */
+  {
+    n: 3, label: 'Why our firm', revealAt: 2700,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Why [Your firm]', '03')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">A globally regulated wealth manager serving international clients across the GCC, UK, US, Europe, and Asia Pacific. Chartered status at firm level. Six entities across five jurisdictions, governed under a single investment proposition.</p>
+
+        <div class="grid grid-cols-4 gap-3 mt-6 stagger">
+          ${[
+            ['$10B+', 'Group AUM'],
+            ['800', 'Staff across the group'],
+            ['15', 'Regulatory licences'],
+            ['6', 'Group entities'],
+          ].map(([v, l]) => `
+            <div class="doc-card">
+              <div class="display-num">${v}</div>
+              <div class="label mt-2">${l}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <div class="doc-card">
+            <div class="label mb-3">Regulatory footprint</div>
+            <div class="space-y-2 text-[11px]">
+              ${[['FCA', 'United Kingdom'], ['SEC', 'United States'], ['SCA', 'United Arab Emirates'], ['FSC', 'Mauritius'], ['LFSA', 'Malaysia'], ['ASIC', 'Australia'], ['ICCS', 'Cyprus / EU']].map(([reg, juris]) => `
+                <div class="flex items-center justify-between"><span class="font-semibold text-slate-700">${reg}</span><span class="text-slate-500">${juris}</span></div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="doc-card">
+            <div class="label mb-3">Recent recognition</div>
+            <div class="space-y-2 text-[10.5px] text-slate-700">
+              <div class="flex items-start gap-2"><span class="pill pill-emerald mt-0.5">2024</span><span>Excellence in Advisory — International Investments</span></div>
+              <div class="flex items-start gap-2"><span class="pill pill-emerald mt-0.5">2024</span><span>Best Client Service Solution</span></div>
+              <div class="flex items-start gap-2"><span class="pill pill-emerald mt-0.5">2023</span><span>Active Manager of the Year — Wealth &amp; Asset Management</span></div>
+              <div class="flex items-start gap-2"><span class="pill pill-slate mt-0.5">FT</span><span>Top 100 Advisors (Group)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 doc-card-tinted text-[11px] text-slate-700 leading-relaxed">
+          <strong class="text-slate-900">Chartered status, twice over.</strong> One of very few international advisory firms to hold Chartered status from both the Chartered Institute of Securities &amp; Investments (CISI) at firm level, and International Professional Partner Firm status with the Chartered Insurance Institute (CII).
+        </div>
+
+        ${pageFooter(3)}
+      </div>
+    `,
+  },
+
+  /* ---------- 04 CLIENT CLASSIFICATION ---------- */
+  {
+    n: 4, label: 'Classification', revealAt: 3400,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Client classification', '04')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">Your classification governs the standard of care, level of disclosure, and protection mechanisms applied throughout our engagement. Both the category and risk profile are reviewable on request and at scheduled reviews.</p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3 stagger">
+          <div class="doc-card accent-stripe">
+            <div class="flex items-start justify-between mb-2">
+              <span class="label">Category</span>
+              <span class="pill pill-teal">Highest protection</span>
+            </div>
+            <h2 class="page-title mt-1">Ordinary Client</h2>
+            <p class="mt-3 text-[11px] text-slate-600 leading-relaxed">Ordinary Clients receive the highest level of regulatory protection available. Categorisation persists across all services, products and transactions unless changed in writing.</p>
+            <div class="hl mt-4 mb-4"></div>
+            <div class="text-[10.5px] text-slate-500"><strong>Applies to:</strong> all financial planning, investment advice, insurance, and ongoing servicing within this engagement.</div>
+          </div>
+
+          <div class="doc-card accent-stripe gold">
+            <div class="flex items-start justify-between mb-2">
+              <span class="label">Risk profile</span>
+              <span class="pill pill-gold">ATR completed in-call</span>
+            </div>
+            <h2 class="page-title mt-1">Balanced — Growth lean</h2>
+            <div class="mt-4 flex items-center gap-1.5">
+              ${['Defensive','Cautious','Balanced','Growth','Adventurous'].map((tier, i) => `
+                <div class="flex-1 text-center">
+                  <div class="h-1.5 rounded-sm" style="background: ${i===2 || i===3 ? 'var(--teal)' : '#e2e8f0'}"></div>
+                  <div class="mt-1 text-[8.5px] uppercase tracking-wider text-slate-500 font-semibold">${tier}</div>
+                </div>
+              `).join('')}
+            </div>
+            <p class="mt-4 text-[11px] text-slate-600 leading-relaxed">Stated tolerance for moderate drawdown in exchange for long-term growth. Bias toward Growth on a 5-year horizon, dropping to Balanced as repatriation approaches.</p>
+          </div>
+        </div>
+
+        <div class="mt-3 doc-card">
+          <div class="label mb-3">Capacity for loss — scenario modelling</div>
+          <div class="grid grid-cols-3 gap-3">
+            ${[
+              ['-15% drawdown', '£345k', 'Within tolerance', 'pill-emerald'],
+              ['-25% drawdown', '£575k', 'Acceptable under 7y horizon', 'pill-gold'],
+              ['-35% drawdown', '£805k', 'Stress-test threshold', 'pill-rose'],
+            ].map(([scen, loss, status, p]) => `
+              <div class="text-center">
+                <div class="display-num-sm mono-num">${loss}</div>
+                <div class="text-[10px] text-slate-500 mt-1">${scen}</div>
+                <span class="pill ${p} mt-2 inline-block">${status}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        ${pageFooter(4)}
+      </div>
+    `,
+  },
+
+  /* ---------- 06 ASSET OVERVIEW ---------- */
+  {
+    n: 6, label: 'Asset overview', revealAt: 4100,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Personal &amp; financial position', '06')}
+
+        <div class="grid grid-cols-4 gap-3 mt-5 stagger">
+          ${[
+            ['Gross AUM',      'GBP 2.40M', 'Across 9 holdings, 4 currencies', 'teal'],
+            ['Net AUM',        'GBP 2.05M', 'After UK property mortgages',     'teal'],
+            ['Liquid AUM',     'GBP 188k',  'Cash + freezone biz balance',     'gold'],
+            ['Monthly surplus','GBP 21.4k', '~62% of net income retained',     'gold'],
+          ].map(([l, v, sub, c]) => `
+            <div class="doc-card accent-stripe ${c}">
+              <div class="label">${l}</div>
+              <div class="display-num-sm mt-2 mono-num">${v}</div>
+              <div class="text-[10px] text-slate-500 mt-2">${sub}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-5 grid grid-cols-3 gap-3 stagger">
+
+          <div class="doc-card-tinted">
+            <div class="label mb-2.5" style="color: #0d9488"><svg class="inline w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Cash &amp; liquid</div>
+            ${assetLine('Riyad Bank (KSA salary)', 'SAR 280,000', '~£55k')}
+            ${assetLine('NatWest (UK current)', 'GBP 88,000')}
+            ${assetLine('Emirates NBD (DMCC biz)', 'AED 215,000', '~£45k')}
+            <div class="hl my-2.5"></div>
+            <div class="flex justify-between text-[11px] font-semibold"><span>Total liquid</span><span class="mono-num">£188,000</span></div>
+          </div>
+
+          <div class="doc-card-tinted">
+            <div class="label mb-2.5" style="color: #b45309"><svg class="inline w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pensions &amp; retirement</div>
+            ${assetLine('KSA EOSB accrued', 'SAR 1.20M', '~£255k', 'amber')}
+            ${assetLine('PIF DC pension', 'SAR 580,000', '~£124k')}
+            ${assetLine('UK Aviva (frozen)', 'GBP 145,000')}
+            <div class="hl my-2.5"></div>
+            <div class="flex justify-between text-[11px] font-semibold"><span>Total retirement</span><span class="mono-num">£524,000</span></div>
+          </div>
+
+          <div class="doc-card-tinted">
+            <div class="label mb-2.5" style="color: #4f46e5"><svg class="inline w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>UK property</div>
+            ${assetLine('Surrey home (rented)', 'GBP 950,000')}
+            ${assetLine('Clapham BTL', 'GBP 580,000')}
+            ${assetLine('Mortgages outstanding', 'GBP (600,000)', '', 'rose')}
+            <div class="hl my-2.5"></div>
+            <div class="flex justify-between text-[11px] font-semibold"><span>Net property</span><span class="mono-num">£930,000</span></div>
+            <div class="mt-1 text-[10px] text-slate-500">Combined rental: GBP 6,600 / mo</div>
+          </div>
+
+        </div>
+
+        <div class="mt-3 grid grid-cols-3 gap-3">
+          <div class="doc-card-tinted col-span-2">
+            <div class="label mb-2.5">Investment wrappers &amp; structures</div>
+            <div class="grid grid-cols-2 gap-3 text-[11px]">
+              <div>
+                ${assetLine('UK ISA (Vanguard, frozen)', 'GBP 78,000')}
+                ${assetLine('DMCC freezone company', '~AED 250k turnover')}
+                ${assetLine('UAE Golden Visa', 'via DMCC route', '', 'teal')}
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-600 leading-relaxed">Structure leverages the DMCC route for UAE Golden Visa, separating GCC business interests from KSA employment. Caroline holds a dependant visa under James's status.</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-card-tinted">
+            <div class="label mb-2.5">Protection coverage</div>
+            <div class="space-y-1.5 text-[10.5px]">
+              <div class="flex justify-between"><span>Life cover</span><span class="pill pill-gold">3× salary (PIF)</span></div>
+              <div class="flex justify-between"><span>Critical illness</span><span class="pill pill-rose">Not in place</span></div>
+              <div class="flex justify-between"><span>UK Will</span><span class="pill pill-gold">Stale (2017)</span></div>
+              <div class="flex justify-between"><span>KSA / UAE Will</span><span class="pill pill-rose">Not in place</span></div>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(6)}
+      </div>
+    `,
+  },
+
+  /* ---------- 09 RETIREMENT GAP ---------- */
+  {
+    n: 9, label: 'Retirement gap', revealAt: 4800,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Retirement gap analysis', '09')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">A two-phase model. Phase one (5y) targets clean UK repatriation in 2031. Phase two (8y after) targets sustainable retirement income at age 58.</p>
+
+        <div class="grid grid-cols-3 gap-3 mt-5 stagger">
+          <div class="doc-card accent-stripe rose col-span-1">
+            <div class="label">Funding gap to retirement</div>
+            <div class="display-num mt-2" style="color: #be123c">£1.46M</div>
+            <div class="text-[10px] text-slate-500 mt-2">at 7% net growth, 13y horizon</div>
+          </div>
+          <div class="doc-card accent-stripe gold">
+            <div class="label">Required monthly contribution</div>
+            <div class="display-num mt-2 mono-num">£8,420</div>
+            <div class="text-[10px] text-slate-500 mt-2">~SAR 39,800 &middot; 24% of surplus</div>
+          </div>
+          <div class="doc-card accent-stripe">
+            <div class="label">Projected wealth at 58</div>
+            <div class="display-num mt-2 mono-num">£2.95M</div>
+            <div class="text-[10px] text-slate-500 mt-2">net of UK property, post-recs</div>
+          </div>
+        </div>
+
+        <div class="mt-5 doc-card">
+          <div class="label mb-3">Closing the gap — visualization</div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-[10.5px] text-slate-600 mb-1"><span>Status quo trajectory at age 58</span><span class="mono-num font-semibold">£1.49M</span></div>
+              <div class="h-3 bg-slate-100 rounded overflow-hidden"><div class="h-full" style="width: 50%; background: linear-gradient(90deg, #fda4af, #f43f5e)"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10.5px] text-slate-600 mb-1"><span>Target wealth at 58 (target net income £95k inflation-adjusted)</span><span class="mono-num font-semibold">£2.95M</span></div>
+              <div class="h-3 bg-slate-100 rounded overflow-hidden"><div class="h-full" style="width: 100%; background: linear-gradient(90deg, #34d399, #0d9488)"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10.5px] text-slate-600 mb-1"><span>With recommended contribution plan</span><span class="mono-num font-semibold text-emerald-700">£2.95M ✓</span></div>
+              <div class="h-3 bg-slate-100 rounded overflow-hidden"><div class="h-full bg-emerald-500" style="width: 100%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-3">
+          <div class="doc-card-tinted">
+            <div class="label mb-2">Sensitivity — monthly contribution by growth rate</div>
+            <table class="w-full text-[11px] mono-num"><tbody>
+              <tr><td class="py-1 font-sans text-slate-600">At 5%</td><td class="text-right">£10,180 / mo</td></tr>
+              <tr><td class="py-1 font-sans text-slate-600">At 7%</td><td class="text-right font-semibold">£8,420 / mo</td></tr>
+              <tr><td class="py-1 font-sans text-slate-600">At 9%</td><td class="text-right">£6,950 / mo</td></tr>
+            </tbody></table>
+          </div>
+          <div class="doc-card-tinted">
+            <div class="label mb-2">Income assumptions at retirement</div>
+            <table class="w-full text-[11px]"><tbody>
+              <tr><td class="py-1">Net income target (today)</td><td class="text-right mono-num">£75,000</td></tr>
+              <tr><td class="py-1">Inflation-adjusted (3% pa, 13y)</td><td class="text-right mono-num">£110,150</td></tr>
+              <tr><td class="py-1">Gross-up requirement</td><td class="text-right mono-num">£134,360</td></tr>
+              <tr><td class="py-1">Safe withdrawal rate</td><td class="text-right mono-num">5.0%</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        ${pageFooter(9)}
+      </div>
+    `,
+  },
+
+  /* ---------- 11 UK TAX BANDS ---------- */
+  {
+    n: 11, label: 'UK tax bands', revealAt: 5500,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('UK income tax · retirement gross-up', '11')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">To deliver your net retirement income of <strong class="mono-num">£75,000</strong>, gross income is calculated against UK income tax bands as at the date of drawdown. Inflation-adjusted figures shown for 2039.</p>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <div class="doc-card accent-stripe">
+            <div class="label">Annual tax liability (today)</div>
+            <div class="display-num mt-2 mono-num">£16,470</div>
+            <div class="text-[10px] text-slate-500 mt-2">~17.99% effective rate on £91,470 gross</div>
+          </div>
+          <div class="doc-card accent-stripe gold">
+            <div class="label">Tax liability at retirement (2039)</div>
+            <div class="display-num mt-2 mono-num">£24,210</div>
+            <div class="text-[10px] text-slate-500 mt-2">~18.00% effective on £134,360 gross</div>
+          </div>
+        </div>
+
+        <div class="mt-5 doc-card">
+          <div class="label mb-3">Income split across tax bands (today's rates)</div>
+          <div class="rounded overflow-hidden flex h-12">
+            <div class="flex items-center justify-center text-white text-[10.5px] font-semibold" style="width: 13.7%; background: #14b8a6">£12,570 · 0%</div>
+            <div class="flex items-center justify-center text-white text-[10.5px] font-semibold" style="width: 41.2%; background: #0d9488">£37,700 · 20%</div>
+            <div class="flex items-center justify-center text-white text-[10.5px] font-semibold" style="width: 32.8%; background: #0f766e">£30,000 · 40%</div>
+            <div class="flex items-center justify-center text-white text-[10.5px] font-semibold" style="width: 12.3%; background: #064e3b">£11,200 · 45%</div>
+          </div>
+          <div class="mt-1.5 flex justify-between text-[9px] uppercase tracking-wider text-slate-400 mono-num">
+            <span>£0</span><span>£91,470 gross</span>
+          </div>
+        </div>
+
+        <table class="w-full text-[11px] mt-4 mono-num"><thead><tr class="text-slate-500 border-b border-slate-200" style="font-family: Inter"><th class="text-left font-semibold pb-1.5 uppercase tracking-wider text-[9.5px]">Band</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Range</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Rate</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Gross</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Tax</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Net</th></tr></thead><tbody>
+          <tr><td class="py-1.5">Personal Allowance</td><td class="text-right">£0 – 12,570</td><td class="text-right">0%</td><td class="text-right">£12,570</td><td class="text-right">£0</td><td class="text-right">£12,570</td></tr>
+          <tr><td class="py-1.5">Basic Rate</td><td class="text-right">£12,571 – 50,270</td><td class="text-right">20%</td><td class="text-right">£37,700</td><td class="text-right">£7,540</td><td class="text-right">£30,160</td></tr>
+          <tr><td class="py-1.5">Higher Rate</td><td class="text-right">£50,271 – 125,140</td><td class="text-right">40%</td><td class="text-right">£30,000</td><td class="text-right">£12,000</td><td class="text-right">£18,000</td></tr>
+          <tr><td class="py-1.5">Additional Rate</td><td class="text-right">Over £125,140</td><td class="text-right">45%</td><td class="text-right">£11,200</td><td class="text-right">£5,040</td><td class="text-right">£6,160</td></tr>
+          <tr class="border-t-2 border-slate-300 font-semibold"><td class="py-2 pt-2.5">Total</td><td></td><td></td><td class="text-right">£91,470</td><td class="text-right">£16,470</td><td class="text-right">£75,000</td></tr>
+        </tbody></table>
+
+        <div class="mt-4 doc-card-warm">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-7 h-7 rounded-md grid place-items-center mt-0.5" style="background: #fef3c7"><svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div>
+              <div class="text-[12px] font-semibold text-amber-900">Statutory residence on UK return</div>
+              <div class="text-[10.5px] text-amber-900/85 leading-relaxed mt-1">UK Statutory Residence Test (SRT) implications need pre-2031 planning. Days-in-country tracking, "ties" assessment, and split-year treatment all material. Independent UK tax counsel recommended 12–18 months ahead of return.</div>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(11)}
+      </div>
+    `,
+  },
+
+  /* ---------- 13 KSA EOSB ANALYSIS ---------- */
+  {
+    n: 13, label: 'KSA EOSB', revealAt: 6200,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('KSA End-of-Service Benefits · analysis', '13')}
+        <p class="mt-4 text-[12px] text-slate-600 leading-relaxed max-w-2xl">Saudi labour law mandates End-of-Service Benefits (EOSB) for foreign employees on termination or contract end. PIF, as employer, accrues the benefit on your behalf — currently sitting in the employer ledger without yield.</p>
+
+        <div class="grid grid-cols-3 gap-3 mt-5 stagger">
+          <div class="doc-card accent-stripe gold">
+            <div class="label">EOSB accrued to date</div>
+            <div class="display-num mt-2 mono-num">SAR 1.20M</div>
+            <div class="text-[10px] text-slate-500 mt-2">~ GBP 255,000 &middot; 5y service</div>
+          </div>
+          <div class="doc-card accent-stripe">
+            <div class="label">Projected EOSB at exit (2031)</div>
+            <div class="display-num mt-2 mono-num">SAR 2.40M</div>
+            <div class="text-[10px] text-slate-500 mt-2">~ GBP 510,000 &middot; 10y service est.</div>
+          </div>
+          <div class="doc-card accent-stripe rose">
+            <div class="label">Yield on current arrangement</div>
+            <div class="display-num mt-2" style="color: #be123c">0.0%</div>
+            <div class="text-[10px] text-slate-500 mt-2">sits in employer ledger</div>
+          </div>
+        </div>
+
+        <div class="mt-5 doc-card">
+          <div class="label mb-3">KSA EOSB calculation methodology</div>
+          <div class="grid grid-cols-2 gap-5 text-[11px] text-slate-700 leading-relaxed">
+            <div>
+              <div class="font-semibold mb-1">First five years</div>
+              <p>Half month's wage per year of service.<br>Calculation base: last drawn wage (including allowances).</p>
+            </div>
+            <div>
+              <div class="font-semibold mb-1">Beyond five years</div>
+              <p>Full month's wage per year of service.<br>Five-year mark passed in Q3 2025 — accrual rate now doubled.</p>
+            </div>
+          </div>
+          <div class="hl my-4"></div>
+          <div class="text-[10.5px] text-slate-700 leading-relaxed">EOSB is paid on contract termination by the employer in lump sum, in SAR. Subject to no KSA withholding tax for foreign nationals. UK tax treatment on receipt depends on residency status at the time of payment.</div>
+        </div>
+
+        <div class="mt-3 doc-card-tinted">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-8 h-8 rounded-md grid place-items-center" style="background: #ccfbf1"><svg class="w-4 h-4 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="flex-1">
+              <div class="text-[12px] font-semibold text-teal-900">Recommendation summary</div>
+              <p class="text-[11px] text-slate-700 leading-relaxed mt-1.5">Establish a parallel structure to deploy projected SAR 2.40M EOSB efficiently on exit. Phase plan: tax-efficient receipt while non-UK resident (pre-SRT clock), redirect to multi-currency wrapper, allocate per balanced-growth mandate. Detailed structure follows in sections 15–17.</p>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(13)}
+      </div>
+    `,
+  },
+
+  /* ---------- 15 PLATFORM RECOMMENDATION ---------- */
+  {
+    n: 15, label: 'Platform', revealAt: 6900,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Recommended platform — international wrapper', '15')}
+
+        <div class="grid grid-cols-[1.1fr_1.4fr] gap-3 mt-5">
+          <div class="doc-card-hero">
+            <div class="text-[10px] uppercase tracking-[0.22em] text-teal-300 font-semibold">Platform provider</div>
+            <div class="mt-2 text-[28px] font-semibold leading-tight">[International Wrapper]</div>
+            <div class="mt-2 text-[11px] text-white/65 leading-relaxed">Offshore multi-currency life-assurance platform &middot; Isle of Man &middot; 35+ years &middot; AKG B+ (4★)</div>
+
+            <div class="mt-6 grid grid-cols-2 gap-y-3 gap-x-4">
+              ${[
+                ['250,000+', 'Policyholders'],
+                ['170', 'Countries'],
+                ['$20B+', 'Assets under custody'],
+                ['350+', 'Fund universe'],
+              ].map(([v, l]) => `
+                <div>
+                  <div class="text-[18px] font-semibold mono-num">${v}</div>
+                  <div class="text-[9px] uppercase tracking-wider text-white/55 font-semibold mt-0.5">${l}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="absolute -right-12 -bottom-12 w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(13,148,136,0.25), transparent 60%)"></div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="doc-card-tinted">
+              <div class="label mb-2.5">Why this platform for your case</div>
+              <ul class="space-y-2 text-[11px] text-slate-700 leading-relaxed">
+                <li class="flex items-start gap-2"><div class="w-4 h-4 rounded-full text-[10px] font-semibold grid place-items-center mt-0.5 shrink-0" style="background: #ccfbf1; color: #115e59">1</div><span><strong>Multi-currency</strong> — GBP / EUR / USD / CHF / AUD / HKD / JPY supports your eventual UK repatriation in GBP.</span></li>
+                <li class="flex items-start gap-2"><div class="w-4 h-4 rounded-full text-[10px] font-semibold grid place-items-center mt-0.5 shrink-0" style="background: #ccfbf1; color: #115e59">2</div><span><strong>Tax-deferred</strong> growth inside the wrapper, with 5% pa cumulative withdrawal allowance — critical given UK SRT exposure on return.</span></li>
+                <li class="flex items-start gap-2"><div class="w-4 h-4 rounded-full text-[10px] font-semibold grid place-items-center mt-0.5 shrink-0" style="background: #ccfbf1; color: #115e59">3</div><span><strong>Open architecture</strong> — 350+ funds, no initial fund charges, low platform admin.</span></li>
+                <li class="flex items-start gap-2"><div class="w-4 h-4 rounded-full text-[10px] font-semibold grid place-items-center mt-0.5 shrink-0" style="background: #ccfbf1; color: #115e59">4</div><span><strong>Flex</strong> — stop / start payments, lump-sum top-ups for EOSB redirection, online fund switching.</span></li>
+                <li class="flex items-start gap-2"><div class="w-4 h-4 rounded-full text-[10px] font-semibold grid place-items-center mt-0.5 shrink-0" style="background: #ccfbf1; color: #115e59">5</div><span><strong>Custodian-grade</strong> — Citibank custody &middot; Allfunds settlement &middot; Munich Re reinsurance.</span></li>
+              </ul>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="doc-card-tinted">
+                <div class="label mb-1">Regulator</div>
+                <div class="text-[13px] font-semibold">Isle of Man FSA</div>
+                <div class="text-[10px] text-slate-500 mt-1">Reg ref: [redacted in demo]</div>
+              </div>
+              <div class="doc-card-tinted">
+                <div class="label mb-1">Settlement / custody</div>
+                <div class="text-[13px] font-semibold">Citibank N.A.</div>
+                <div class="text-[10px] text-slate-500 mt-1">Top-tier US bank, $12.8T AUC</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(15)}
+      </div>
+    `,
+  },
+
+  /* ---------- 16 MECHANICS ---------- */
+  {
+    n: 16, label: 'Mechanics', revealAt: 7500,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Recommended structure &amp; mechanics', '16')}
+
+        <div class="grid grid-cols-[1.2fr_1fr] gap-3 mt-5">
+
+          <div class="doc-card accent-stripe">
+            <div class="label">Recommended monthly contribution</div>
+            <div class="display-num mt-2 mono-num" style="color: #0a0e16">SAR 39,800</div>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span class="text-[12px] text-slate-600 mono-num">~ GBP 8,400 / mo</span>
+              <span class="pill pill-teal">24% of surplus</span>
+            </div>
+
+            <div class="hl my-4"></div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <div class="label-dim">Projection at age 58</div>
+                <div class="display-num-sm mt-1 mono-num text-emerald-700">£2.95M</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">7% net pa, all sleeves</div>
+              </div>
+              <div>
+                <div class="label-dim">Plus EOSB redirect</div>
+                <div class="display-num-sm mt-1 mono-num">£510k</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">via wrapper top-up 2031</div>
+              </div>
+              <div>
+                <div class="label-dim">Combined target</div>
+                <div class="display-num-sm mt-1 mono-num" style="color: var(--teal)">£3.46M</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">vs. target £2.95M</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="label mb-3">Fee disclosure</div>
+            <table class="w-full text-[11px] mono-num"><tbody>
+              <tr><td class="py-1 font-sans">Initial Charge Period</td><td class="text-right">18 mo</td></tr>
+              <tr><td class="py-1 font-sans">ICP fee</td><td class="text-right">0.50% / mo</td></tr>
+              <tr><td class="py-1 font-sans">Annual management</td><td class="text-right">0.125% / mo</td></tr>
+              <tr><td class="py-1 font-sans">Platform admin</td><td class="text-right">GBP 9.80 / mo</td></tr>
+              <tr><td class="py-1 font-sans">Switching fee</td><td class="text-right">GBP 0 (online)</td></tr>
+              <tr><td class="py-1 font-sans">Starter bonus</td><td class="text-right" style="color: #059669">+ GBP 6,840</td></tr>
+              <tr class="border-t border-slate-200 font-semibold"><td class="py-1.5 pt-2 font-sans">Total RIY (est.)</td><td class="text-right">1.45%</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-4 gap-2">
+          ${[
+            ['🔄', 'Stop/start payments', 'Outside ICP window'],
+            ['❄️', 'Freeze on demand', 'No exit penalty'],
+            ['⬆️', 'Lump-sum top-ups', 'From GBP 8,000'],
+            ['🌐', 'Online switching', '24/7 fund changes'],
+          ].map(([emoji, t, sub]) => `
+            <div class="doc-card-tinted text-center">
+              <div class="text-[20px]">${emoji}</div>
+              <div class="text-[11px] font-semibold mt-1">${t}</div>
+              <div class="text-[9px] text-slate-500 mt-0.5">${sub}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-3 doc-card-warm">
+          <div class="text-[10.5px] text-slate-700 leading-relaxed"><strong>EOSB redirection at exit (2031):</strong> Lump-sum top-up of SAR 2.40M (~GBP 510k) into the same wrapper at exit, while still KSA-resident — capturing full tax efficiency before UK SRT triggers. Wrapper acts as a single coherent vehicle through transition.</div>
+        </div>
+
+        ${pageFooter(16)}
+      </div>
+    `,
+  },
+
+  /* ---------- 17 PLATFORM ILLUSTRATION ---------- */
+  {
+    n: 17, label: 'Illustration', revealAt: 8200,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Illustration · projected wealth path', '17')}
+        <p class="mt-3 text-[12px] text-slate-600 leading-relaxed">Net of all contractual fees. 7% gross / 5.5% net assumed (consistent with Balanced-Growth mandate historical). Includes SAR 2.40M EOSB top-up at 2031 (age 50).</p>
+
+        <div class="mt-4 doc-card">
+          ${growthChartSVG()}
+          <div class="grid grid-cols-4 gap-3 mt-4">
+            <div><div class="label-dim">Age 45 (today)</div><div class="display-num-sm mt-1 mono-num">£188k</div></div>
+            <div><div class="label-dim">Age 50 (exit)</div><div class="display-num-sm mt-1 mono-num">£1.04M</div></div>
+            <div><div class="label-dim">Age 55</div><div class="display-num-sm mt-1 mono-num">£2.16M</div></div>
+            <div><div class="label-dim">Age 58 (retire)</div><div class="display-num-sm mt-1 mono-num" style="color: var(--teal)">£2.95M</div></div>
+          </div>
+        </div>
+
+        <div class="mt-3 doc-card">
+          <div class="label mb-3">Year-by-year projection (selected)</div>
+          <table class="w-full text-[11px] mono-num"><thead><tr class="text-slate-500 border-b border-slate-200" style="font-family: Inter"><th class="text-left font-semibold pb-1.5 uppercase tracking-wider text-[9.5px]">Age</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Yr</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Contribution</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Growth</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Fund value</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Note</th></tr></thead><tbody>
+            ${[
+              [45, 0, 188000, 10340, 298840, ''],
+              [46, 1, 100800, 16438, 416078, ''],
+              [47, 2, 100800, 22884, 539762, ''],
+              [48, 3, 100800, 29687, 670249, ''],
+              [49, 4, 100800, 36863, 807912, ''],
+              [50, 5, 100800, 510000, 1418712, 'EOSB redirect'],
+              [52, 7, 100800, 78029, 1668430, ''],
+              [55, 10, 100800, 110890, 2164940, ''],
+              [58, 13, 100800, 153420, 2953560, 'Target reached'],
+            ].map(r => `<tr class="border-b border-slate-100 ${r[5] ? 'bg-emerald-50' : ''}"><td class="py-1.5">${r[0]}</td><td class="text-right">${r[1]}</td><td class="text-right">£${r[2].toLocaleString()}</td><td class="text-right ${r[5]==='EOSB redirect' ? 'text-amber-700 font-semibold' : ''}">£${r[3].toLocaleString()}</td><td class="text-right font-semibold">£${r[4].toLocaleString()}</td><td class="text-right text-[10px] ${r[5] ? 'text-emerald-700 font-semibold' : 'text-slate-400'}">${r[5]}</td></tr>`).join('')}
+          </tbody></table>
+        </div>
+
+        ${pageFooter(17)}
+      </div>
+    `,
+  },
+
+  /* ---------- 22 INVESTMENT PHILOSOPHY ---------- */
+  {
+    n: 22, label: 'Philosophy', revealAt: 8800,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Investment philosophy', '22')}
+        <p class="mt-3 text-[12px] text-slate-600 leading-relaxed max-w-2xl">Three principles sit at the centre of every portfolio we construct. Decisions are made through systematic research, not emotion.</p>
+
+        <div class="grid grid-cols-3 gap-3 mt-6 stagger">
+          ${[
+            ['01', 'Active', 'teal', 'High-conviction selection. Managers chosen for consistent outperformance against peer group benchmark over 3 and 5 years.', ['Top quartile', '5y rolling', 'Peer-tested']],
+            ['02', 'Low cost', 'gold', 'Open architecture across the industry. Institutional fee rates accessed through the platform\'s collective scale.', ['Inst. share class', '0.35% blend', 'No initial']],
+            ['03', 'Responsibility', 'indigo', 'ESG-tilted and Sharia-compliant variants available. Investment Committee governance over all mandates.', ['ESG tilt', 'Sharia opt.', 'IC reviewed']],
+          ].map(([n, t, c, body, tags]) => `
+            <div class="doc-card accent-stripe ${c}">
+              <div class="label-dim">${n}</div>
+              <div class="mt-1 text-[20px] font-semibold tracking-tight">${t}</div>
+              <p class="mt-2 text-[11px] text-slate-600 leading-relaxed">${body}</p>
+              <div class="mt-3 flex flex-wrap gap-1">
+                ${tags.map(t => `<span class="pill pill-slate">${t}</span>`).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-5 doc-card">
+          <div class="label mb-3">Investment governance cadence</div>
+          <div class="grid grid-cols-3 gap-5 text-[11px]">
+            <div><div class="font-semibold mb-1">Monthly</div><div class="text-slate-600 leading-relaxed">Investment Committee — proposition critique &amp; suitability review of every mandate</div></div>
+            <div><div class="font-semibold mb-1">Quarterly</div><div class="text-slate-600 leading-relaxed">Adviser briefing — portfolio commentary, rebalancing decisions, sector positioning</div></div>
+            <div><div class="font-semibold mb-1">Ad-hoc</div><div class="text-slate-600 leading-relaxed">Convened for material market events (rate decisions, geopolitical shocks, regulatory change)</div></div>
+          </div>
+        </div>
+
+        ${pageFooter(22)}
+      </div>
+    `,
+  },
+
+  /* ---------- 23 MARKET OUTLOOK ---------- */
+  {
+    n: 23, label: 'Market outlook', revealAt: 9400,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Market outlook · Q1 2026', '23')}
+
+        <div class="mt-3 flex items-center gap-3 flex-wrap">
+          <span class="pill pill-teal">Q1 2026</span>
+          <span class="pill pill-slate">Macro overview</span>
+          <span class="text-[10px] text-slate-500">Authored by [Chief Investment Officer] · published 14 Jan 2026</span>
+        </div>
+
+        <div class="mt-5 grid grid-cols-[2fr_1fr] gap-5">
+          <div class="body-prose space-y-3">
+            <p class="text-[14px] font-medium text-slate-900 leading-snug" style="font-family: 'Source Serif 4'">Markets enter 2026 with steadier ground underfoot, though the path remains uneven. Several themes that dominated late 2025 are evolving rather than resolving.</p>
+            <p>In November, investors began to question whether the US would continue cutting interest rates, largely due to a lack of up-to-date economic data. This uncertainty pushed government bond yields higher before reversing later in the quarter as the central bank struck a more cautious tone, reacting to signs of a cooling labour market and ultimately delivering a further rate cut.</p>
+            <p>At the same time, the powerful rally in artificial-intelligence-related shares came under pressure. Concerns grew around rising levels of borrowing and money circulating within the AI sector itself, leading some investors to worry that share prices had moved ahead of fundamentals. Optimism returned after stronger-than-expected technology earnings, reminding markets why the AI story remains compelling.</p>
+            <p>Encouragingly, broader economic data continued to hold up. While global trade patterns have been disrupted, the impact has been softer than many feared. Growth was recorded across the US, Canada, the euro area and the UK, although Japan experienced a contraction.</p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="doc-card-tinted">
+              <div class="label mb-2">Key Q1 takeaways</div>
+              <ul class="space-y-2 text-[10.5px] text-slate-700 leading-relaxed">
+                <li class="flex items-start gap-2"><span class="text-teal-600 font-bold">→</span><span>Rate-cut cycle continues, though pace uncertain</span></li>
+                <li class="flex items-start gap-2"><span class="text-teal-600 font-bold">→</span><span>AI rally moderating; broader market participation widening</span></li>
+                <li class="flex items-start gap-2"><span class="text-teal-600 font-bold">→</span><span>Trade-policy noise lower; tariff impact softer than feared</span></li>
+                <li class="flex items-start gap-2"><span class="text-teal-600 font-bold">→</span><span>UK gilts: improving fiscal clarity, inflation easing</span></li>
+              </ul>
+            </div>
+
+            <div class="doc-card-tinted">
+              <div class="label mb-2">Positioning bias</div>
+              <table class="w-full text-[10.5px]"><tbody>
+                <tr><td class="py-0.5">Equity</td><td class="text-right pill pill-emerald inline-block">Neutral +</td></tr>
+                <tr><td class="py-0.5">Fixed Income</td><td class="text-right pill pill-gold inline-block">Underweight</td></tr>
+                <tr><td class="py-0.5">Cash</td><td class="text-right pill pill-slate inline-block">Underweight</td></tr>
+                <tr><td class="py-0.5">Alternatives</td><td class="text-right pill pill-teal inline-block">Overweight</td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(23)}
+      </div>
+    `,
+  },
+
+  /* ---------- 26 RISK MANDATES ---------- */
+  {
+    n: 26, label: 'Risk mandates', revealAt: 10100,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Risk-weighted strategic asset allocation', '26')}
+        <p class="mt-3 text-[12px] text-slate-600 leading-relaxed">Strategic allocations per risk profile, reviewed monthly by the Investment Committee. Your Balanced-Growth weighting falls between rows 3 and 4 — represented as a 60/40 mix of the two mandates.</p>
+
+        ${riskMandateChart()}
+
+        <table class="w-full text-[11px] mt-5"><thead><tr class="text-slate-500 border-b border-slate-200" style="font-family: Inter"><th class="text-left font-semibold pb-2 uppercase tracking-wider text-[9.5px]">Profile</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Equity</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Fixed Income</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Cash</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Exp. return (5y)</th><th class="text-right font-semibold uppercase tracking-wider text-[9.5px]">Drawdown (max)</th></tr></thead><tbody class="mono-num">
+          ${[
+            ['Defensive',   32.5, 62.4, 5.1, '3.0–4.5%', '-8%',  false],
+            ['Cautious',    47.2, 47.8, 5.0, '4.0–5.5%', '-12%', false],
+            ['Balanced',    60.9, 34.2, 4.9, '5.0–7.0%', '-18%', false],
+            ['Growth',      76.3, 18.8, 5.0, '6.5–8.5%', '-25%', true],
+            ['Adventurous', 82.8, 11.9, 5.3, '7.5–10.5%', '-35%', false],
+          ].map(r => `
+            <tr class="border-b border-slate-100 ${r[6] ? 'bg-emerald-50' : ''}">
+              <td class="py-1.5 font-sans">${r[0]}${r[6] ? ' &larr; recommended (60/40 blend with Balanced)' : ''}</td>
+              <td class="text-right">${r[1]}%</td>
+              <td class="text-right">${r[2]}%</td>
+              <td class="text-right">${r[3]}%</td>
+              <td class="text-right">${r[4]}</td>
+              <td class="text-right text-slate-500">${r[5]}</td>
+            </tr>
+          `).join('')}
+        </tbody></table>
+
+        ${pageFooter(26)}
+      </div>
+    `,
+  },
+
+  /* ---------- 27 MPS RETURNS ---------- */
+  {
+    n: 27, label: 'MPS returns', revealAt: 10800,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Model Portfolio Service · cumulative returns', '27')}
+        <p class="mt-3 text-[11.5px] text-slate-600 leading-relaxed">Net of underlying OCF, gross of platform charges. Highlighted rows correspond to your recommended Balanced-Growth blend.</p>
+
+        ${returnsHeatmap()}
+
+        <div class="mt-4 text-[9.5px] text-slate-500 italic">Past performance is not indicative of future results. Cell shading indicates return magnitude — darker green for stronger periods, faint red for weak.</div>
+
+        ${pageFooter(27)}
+      </div>
+    `,
+  },
+
+  /* ---------- 31 GBP BALANCED MPS ---------- */
+  {
+    n: 31, label: 'GBP Balanced MPS', revealAt: 11500,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('GBP Balanced MPS · composition &amp; holdings', '31')}
+
+        <div class="grid grid-cols-[1fr_1.4fr] gap-3 mt-5">
+
+          <div class="doc-card">
+            <div class="label mb-3">Asset class allocation</div>
+            ${donutSVG([['Equity', 60.51, '#0d9488'], ['Fixed Income', 34.40, '#475569'], ['Cash', 5.09, '#cbd5e1']])}
+            <div class="hl my-4"></div>
+            <div class="label mb-2.5">Key data</div>
+            <table class="w-full text-[10.5px]"><tbody>
+              <tr><td class="py-0.5 text-slate-500">Launch</td><td class="text-right mono-num">Jan 2016</td></tr>
+              <tr><td class="py-0.5 text-slate-500">OCF</td><td class="text-right mono-num">0.75%</td></tr>
+              <tr><td class="py-0.5 text-slate-500">Yield</td><td class="text-right mono-num">2.22%</td></tr>
+              <tr><td class="py-0.5 text-slate-500">Currency</td><td class="text-right mono-num">GBP</td></tr>
+              <tr><td class="py-0.5 text-slate-500">Liquidity</td><td class="text-right mono-num">Daily</td></tr>
+              <tr class="border-t border-slate-200"><td class="py-1 pt-1.5 font-semibold">YTD</td><td class="text-right font-semibold text-emerald-700 mono-num">+7.43%</td></tr>
+              <tr><td class="py-0.5 text-slate-500">vs ARC peers</td><td class="text-right text-slate-500 mono-num">+0.96%</td></tr>
+            </tbody></table>
+          </div>
+
+          <div class="space-y-3">
+
+            <div class="doc-card">
+              <div class="label mb-2.5">Top equity holdings (40 total)</div>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10.5px]">
+                ${[['Alphabet', 2.92], ['NVIDIA', 2.64], ['Eli Lilly', 2.22], ['Amazon', 2.19], ['Uber', 1.72], ['Hermes', 1.72], ['Microsoft', 1.69], ['TSMC', 1.67], ['Broadcom', 1.37], ['CBOE Holdings', 1.32], ['ASML', 1.16], ['Mastercard', 0.87]].map(h => `
+                  <div class="flex items-center justify-between gap-2 border-b border-slate-100 py-1">
+                    <span class="truncate">${h[0]}</span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <div class="w-8 h-1 bg-slate-100 rounded-sm overflow-hidden"><div class="h-full bg-teal-600" style="width: ${(h[1]/3)*100}%"></div></div>
+                      <span class="mono-num text-slate-700 w-9 text-right">${h[1].toFixed(2)}%</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="doc-card-tinted">
+                <div class="label mb-2">Sector tilt</div>
+                <div class="space-y-1.5 text-[10.5px]">
+                  <div class="flex items-center justify-between"><span>Information Technology</span><span class="mono-num">28.4%</span></div>
+                  <div class="flex items-center justify-between"><span>Healthcare</span><span class="mono-num">14.1%</span></div>
+                  <div class="flex items-center justify-between"><span>Financials</span><span class="mono-num">12.9%</span></div>
+                  <div class="flex items-center justify-between"><span>Cons. Discretionary</span><span class="mono-num">11.7%</span></div>
+                  <div class="flex items-center justify-between text-slate-500"><span>Other</span><span class="mono-num">32.9%</span></div>
+                </div>
+              </div>
+              <div class="doc-card-tinted">
+                <div class="label mb-2">Geo split</div>
+                <div class="space-y-1.5 text-[10.5px]">
+                  <div class="flex items-center justify-between"><span>United States</span><span class="mono-num">58.2%</span></div>
+                  <div class="flex items-center justify-between"><span>Europe (ex UK)</span><span class="mono-num">14.8%</span></div>
+                  <div class="flex items-center justify-between"><span>United Kingdom</span><span class="mono-num">9.6%</span></div>
+                  <div class="flex items-center justify-between"><span>Asia-Pacific</span><span class="mono-num">11.2%</span></div>
+                  <div class="flex items-center justify-between text-slate-500"><span>EM &amp; other</span><span class="mono-num">6.2%</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        ${pageFooter(31)}
+      </div>
+    `,
+  },
+
+  /* ---------- 35 PORTFOLIO CHANGES ---------- */
+  {
+    n: 35, label: 'Portfolio changes', revealAt: 12200,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Portfolio changes · Q1 2026 rebalance', '35')}
+        <p class="mt-3 text-[12px] text-slate-600 leading-relaxed">Quarterly committee-driven rebalance. Three additions reflect the conviction-led add-on framework; two reductions trim overlap between CORE and SATELLITE mandates.</p>
+
+        <div class="mt-5 space-y-2.5 stagger">
+          ${[
+            {ticker: 'CMI', name: 'Cummins Inc.', action: 'BUY', sector: 'Industrials', commentary: 'High-return, cash-generative industrial franchise with global powertrain leadership and credible pivot toward decarbonisation. Forward 5y FCF CAGR 5.7% vs implied -0.9%.', color: 'teal'},
+            {ticker: 'EW', name: 'Edwards Lifesciences', action: 'BUY', sector: 'Healthcare', commentary: 'Innovation-led medtech with dominant TAVR position. Forward 5y FCF CAGR 8.5% against implied -1.1% — conservative market expectations.', color: 'teal'},
+            {ticker: 'BABA', name: 'Alibaba Group', action: 'BUY', sector: 'Cons. Discretionary', commentary: 'Reverse-engineered DCF suggests current price implies near-zero long-term growth, despite robust e-commerce and cloud fundamentals.', color: 'teal'},
+            {ticker: 'BKNG', name: 'Booking Holdings', action: 'SELL', sector: 'Cons. Discretionary', commentary: 'CORE/SATELLITE overlap reduction. First tranche of allocation-led rebalance; remains in CORE.', color: 'rose'},
+            {ticker: 'MA', name: 'Mastercard', action: 'SELL', sector: 'Financials', commentary: 'Sector-level overweight reduction. Top-down call against payments concentration.', color: 'rose'},
+          ].map(r => `
+            <div class="doc-card flex items-start gap-4">
+              <div class="shrink-0 text-center">
+                <div class="text-[14px] font-semibold mono-num">${r.ticker}</div>
+                <span class="pill ${r.color === 'teal' ? 'pill-emerald' : 'pill-rose'} mt-1">${r.action}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2">
+                  <h4 class="text-[13px] font-semibold">${r.name}</h4>
+                  <span class="text-[10px] text-slate-500">${r.sector}</span>
+                </div>
+                <p class="mt-1 text-[10.5px] text-slate-600 leading-relaxed">${r.commentary}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        ${pageFooter(35)}
+      </div>
+    `,
+  },
+
+  /* ---------- 40 FEES & TRANSPARENCY ---------- */
+  {
+    n: 40, label: 'Fees', revealAt: 12800,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Fees &amp; transparency', '40')}
+        <p class="mt-3 text-[12px] text-slate-600 leading-relaxed">Full breakdown of every charge applied to the recommended structure. Total RIY estimated at 1.45% pa — below industry average of 1.85% pa for comparable wrappers.</p>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <div class="doc-card">
+            <div class="label mb-3">Platform &amp; product charges</div>
+            <table class="w-full text-[11px] mono-num"><tbody>
+              <tr><td class="py-1 font-sans">ICP fee (18 mo)</td><td class="text-right">0.50% pm</td></tr>
+              <tr><td class="py-1 font-sans">Annual management</td><td class="text-right">0.125% pm</td></tr>
+              <tr><td class="py-1 font-sans">Platform admin</td><td class="text-right">GBP 9.80 pm</td></tr>
+              <tr><td class="py-1 font-sans">Trade execution</td><td class="text-right">GBP 5 / trade</td></tr>
+            </tbody></table>
+          </div>
+          <div class="doc-card">
+            <div class="label mb-3">Underlying OCF</div>
+            <table class="w-full text-[11px] mono-num"><tbody>
+              <tr><td class="py-1 font-sans">Balanced MPS</td><td class="text-right">0.75%</td></tr>
+              <tr><td class="py-1 font-sans">Growth MPS</td><td class="text-right">0.77%</td></tr>
+              <tr><td class="py-1 font-sans">Blended (60/40)</td><td class="text-right font-semibold">0.76%</td></tr>
+              <tr><td class="py-1 font-sans text-slate-500">Industry avg</td><td class="text-right text-slate-500">0.95%</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="mt-3 doc-card-tinted">
+          <div class="grid grid-cols-2 gap-5 items-center">
+            <div>
+              <div class="label mb-2">Total RIY vs industry benchmark</div>
+              <div class="space-y-3 text-[11px]">
+                <div>
+                  <div class="flex justify-between mb-1"><span>Industry average wrapper RIY</span><span class="mono-num font-semibold">1.85%</span></div>
+                  <div class="h-2 bg-slate-100 rounded overflow-hidden"><div class="h-full bg-slate-400" style="width: 100%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1"><span class="text-teal-700">Your structure RIY (est.)</span><span class="mono-num font-semibold text-teal-700">1.45%</span></div>
+                  <div class="h-2 bg-slate-100 rounded overflow-hidden"><div class="h-full bg-teal-500" style="width: 78%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="label mb-1">Starter bonus offset</div>
+              <div class="text-[24px] font-semibold mono-num text-emerald-700">+ GBP 6,840</div>
+              <div class="text-[10px] text-slate-500 mt-1">Credit applied to first 18 months, offsetting ~83% of ICP fees</div>
+            </div>
+          </div>
+        </div>
+
+        ${pageFooter(40)}
+      </div>
+    `,
+  },
+
+  /* ---------- 44 IMPLEMENTATION TIMELINE ---------- */
+  {
+    n: 44, label: 'Timeline', revealAt: 13300,
+    render: () => `
+      <div class="px-7 py-7 relative" style="min-height: 720px">
+        ${pageHeader('Implementation &amp; servicing timeline', '44')}
+
+        <div class="mt-5 grid grid-cols-3 gap-3">
+          ${[
+            ['Phase 01', 'First 6 weeks', 'Implementation', 'teal'],
+            ['Phase 02', '6 months', 'Stabilisation', 'gold'],
+            ['Phase 03', 'Ongoing', 'Cadenced review', 'indigo'],
+          ].map(([n, t, l, c]) => `
+            <div class="doc-card accent-stripe ${c}">
+              <div class="label-dim">${n}</div>
+              <div class="display-num-sm mt-1">${t}</div>
+              <div class="label mt-2">${l}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-5 space-y-2">
+          ${[
+            ['Week 1', 'Spouse review', 'Caroline joins for scope confirmation, ATR re-validation, signatory walkthrough', '#0d9488'],
+            ['Week 2', 'Documentation', 'KYC across providers, source-of-funds, applications prepared and signed', '#0d9488'],
+            ['Week 3', 'First contribution', 'SAR 39,800 standing order initiated · funds allocated 60/40 Balanced/Growth', '#0d9488'],
+            ['Week 4', 'EOSB redirection plan', 'Letter to PIF HR re. preferred receipt structure on exit (2031)', '#b45309'],
+            ['Week 6', 'Implementation audit', 'Allocation verification · rebalance against committee allocation drift', '#b45309'],
+            ['Month 3', 'First review call', 'Performance vs benchmark · positioning commentary · adjustment flagging', '#4f46e5'],
+            ['Quarterly', 'Standing review', 'Portfolio briefing · markets context · goal progress check-in', '#4f46e5'],
+            ['Annual', 'Full review', 'Fact find refresh · review pack issued · 5-year roadmap progress', '#4f46e5'],
+          ].map(([when, what, detail, c]) => `
+            <div class="flex items-start gap-4 border-l-2 pl-4 py-1.5" style="border-color: ${c}">
+              <div class="w-20 shrink-0">
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-700">${when}</div>
+              </div>
+              <div class="flex-1">
+                <div class="text-[12px] font-semibold text-slate-800">${what}</div>
+                <div class="text-[10.5px] text-slate-600 mt-0.5 leading-relaxed">${detail}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        ${pageFooter(44)}
+      </div>
+    `,
+  },
+
+  /* ---------- 47 SIGN-OFF LETTER ---------- */
+  {
+    n: 47, label: 'Letter', revealAt: 13900,
+    render: () => `
+      <div class="px-7 py-7 relative doc-gradient" style="min-height: 720px">
+        ${pageHeader('A personal note from your adviser', '47')}
+
+        <div class="mt-5 max-w-2xl body-prose space-y-3.5">
+          <p class="text-[14px]" style="font-family: 'Source Serif 4'">Dear James,</p>
+          <p>Thank you for the candid conversation on the 22nd. This document is the first step. The figures will change as your life does; the structure is built to flex with them.</p>
+          <p>The 2031 horizon is closer than it feels. Section 44 sets out the first six weeks. I will be in touch on Monday morning to confirm the spouse review with Caroline. She mentioned the NI restart concerns, and I will bring our cross border team into that call.</p>
+          <p>The KSA gratuity piece is the lever I want us to focus on. There is a clear opportunity to capture five years of compounding before you head back to the UK, while you are still non resident for UK purposes. Section 13 sets the case out in detail.</p>
+          <p>In the meantime, your dedicated team (James, Sarah and Helena) are available on the numbers attached. The quarterly cadence is the rhythm. The annual review is the reset. Both are included in our ongoing service.</p>
+          <p class="mt-6 text-slate-600 italic">With my best regards,</p>
+        </div>
+
+        <div class="mt-2 max-w-2xl">
+          <div class="text-[20px] font-serif italic text-slate-900" style="font-family: 'Source Serif 4'">Oliver Whitfield</div>
+          <div class="mt-2 flex items-center gap-4">
+            <div class="text-[10.5px] uppercase tracking-wider text-slate-500 font-semibold">Private Wealth Director</div>
+            <div class="h-3 w-px bg-slate-300"></div>
+            <div class="text-[10.5px] text-slate-500 mono-num">+971 50 248 9170</div>
+            <div class="h-3 w-px bg-slate-300"></div>
+            <div class="text-[10.5px] text-slate-500">oliver.whitfield@firm.com</div>
+          </div>
+        </div>
+
+        ${pageFooter(47)}
+      </div>
+    `,
+  },
+];
+
+/* ---------- helpers used by page renderers ---------- */
+
+function pageHeader(title, n) {
+  return `<div class="flex items-baseline justify-between border-b border-slate-200 pb-3">
+    <h2 class="page-title">${title}</h2>
+    <div class="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold mono-num">Page ${n} / 47</div>
+  </div>`;
+}
+
+function pageFooter(n) {
+  return `<div class="absolute bottom-3 left-7 right-7 flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-slate-300 font-semibold pt-3 border-t border-slate-100">
+    <span>[Your firm] · Bespoke Wealth Assessment</span>
+    <span class="mono-num">${String(n).padStart(2,'0')} / 47</span>
+  </div>`;
+}
+
+function pageStamp(n) {
+  return `<div class="absolute bottom-3 right-8 text-[9px] uppercase tracking-[0.18em] text-slate-300 font-semibold mono-num">${String(n).padStart(2,'0')} / 47</div>`;
+}
+
+function assetLine(label, value, fx = '', accent = '') {
+  const accentCls = accent === 'amber' ? 'text-amber-700 font-semibold' : accent === 'rose' ? 'text-rose-700' : accent === 'teal' ? 'text-teal-700' : 'text-slate-800';
+  return `<div class="flex items-baseline justify-between py-1 text-[11px]">
+    <span class="text-slate-700">${label}</span>
+    <div class="text-right">
+      <span class="mono-num ${accentCls}">${value}</span>
+      ${fx ? `<span class="text-[9.5px] text-slate-400 ml-1.5 mono-num">${fx}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function donutSVG(slices) {
+  const total = slices.reduce((s, [, v]) => s + v, 0);
+  let acc = 0;
+  const r = 36, cx = 50, cy = 50;
+  const segs = slices.map(([, val, color]) => {
+    const start = (acc / total) * Math.PI * 2;
+    acc += val;
+    const end = (acc / total) * Math.PI * 2;
+    const x1 = cx + r * Math.sin(start), y1 = cy - r * Math.cos(start);
+    const x2 = cx + r * Math.sin(end), y2 = cy - r * Math.cos(end);
+    const large = end - start > Math.PI ? 1 : 0;
+    return `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z" fill="${color}" />`;
+  }).join('');
+  const legend = slices.map(([label, val, color]) => `<div class="flex items-center gap-1.5 text-[10.5px] text-slate-700"><span class="w-2 h-2 rounded-sm" style="background:${color}"></span>${label} <span class="text-slate-400 ml-1 mono-num">${val.toFixed(1)}%</span></div>`).join('');
+  return `<div class="flex items-center gap-4"><svg viewBox="0 0 100 100" class="w-24 h-24">${segs}<circle cx="${cx}" cy="${cy}" r="20" fill="white" /></svg><div class="space-y-1">${legend}</div></div>`;
+}
+
+function riskMandateChart() {
+  const profiles = [
+    { name: 'Defensive',   eq: 32.5, fi: 62.4, cash: 5.1, highlight: false },
+    { name: 'Cautious',    eq: 47.2, fi: 47.8, cash: 5.0, highlight: false },
+    { name: 'Balanced',    eq: 60.9, fi: 34.2, cash: 4.9, highlight: false },
+    { name: 'Growth',      eq: 76.3, fi: 18.8, cash: 5.0, highlight: true },
+    { name: 'Adventurous', eq: 82.8, fi: 11.9, cash: 5.3, highlight: false },
+  ];
+  return `<div class="mt-5 doc-card">
+    <div class="label mb-3">Strategic allocation per profile</div>
+    <div class="flex items-end gap-3 h-36">
+      ${profiles.map(p => `
+        <div class="flex-1 flex flex-col items-center">
+          <div class="w-full rounded-t overflow-hidden flex flex-col-reverse h-32 ${p.highlight ? 'ring-2 ring-emerald-500 ring-offset-1' : ''}">
+            <div style="height: ${p.cash}%; background: #cbd5e1"></div>
+            <div style="height: ${p.fi}%; background: #475569"></div>
+            <div style="height: ${p.eq}%; background: #0d9488"></div>
+          </div>
+          <div class="mt-2 text-[9.5px] uppercase tracking-wider font-semibold text-slate-600">${p.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="flex gap-4 mt-3 text-[10px] text-slate-600">
+      <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#0d9488"></span>Equity</div>
+      <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#475569"></span>Fixed Income</div>
+      <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#cbd5e1"></span>Cash</div>
+    </div>
+  </div>`;
+}
+
+function returnsHeatmap() {
+  const rows = [
+    ['GBP', 'Defensive',   [-0.26, 3.61, 6.83, 8.33, 8.16, 23.22, 14.35], false],
+    ['GBP', 'Cautious',    [-0.59, 3.87, 7.51, 8.17, 7.83, 24.59, 19.67], false],
+    ['GBP', 'Balanced',    [-0.87, 4.03, 7.82, 7.43, 7.00, 24.92, 20.92], true],
+    ['GBP', 'Growth',      [-1.02, 5.06, 9.49, 7.92, 7.41, 29.67, 28.34], true],
+    ['GBP', 'Adventurous', [-1.25, 4.69, 9.23, 7.28, 6.60, 29.49, 30.80], false],
+    ['USD', 'Defensive',   [-0.26, 3.63, 7.19, 10.35, 9.03, 25.32, 18.30], false],
+    ['USD', 'Balanced',    [-0.62, 3.47, 7.65, 11.73, 10.05, 32.98, 26.94], false],
+    ['USD', 'Growth',      [-0.69, 4.29, 9.22, 13.63, 11.52, 40.32, 32.50], false],
+    ['EUR', 'Defensive',   [-0.42, 2.83, 5.03, 4.33, 3.81, 16.79, 11.51], false],
+    ['EUR', 'Balanced',    [-0.89, 3.33, 5.49, 3.35, 3.13, 22.37, 24.51], false],
+  ];
+  const cellColor = v => {
+    if (v >= 0) {
+      const intensity = Math.min(1, v / 40);
+      return `background: rgba(13, 148, 136, ${0.08 + intensity * 0.55}); color: ${intensity > 0.4 ? '#fff' : '#0f172a'}`;
+    } else {
+      const intensity = Math.min(1, Math.abs(v) / 5);
+      return `background: rgba(244, 63, 94, ${0.08 + intensity * 0.30}); color: #0f172a`;
+    }
+  };
+  return `<div class="doc-card overflow-hidden mt-4">
+    <table class="w-full text-[11px]"><thead><tr class="border-b border-slate-200" style="font-family: Inter">
+      <th class="text-left font-semibold pb-2 px-2 uppercase tracking-wider text-[9.5px] text-slate-500" colspan="2"></th>
+      ${['1m','3m','6m','YTD','1y','3y','5y'].map(p => `<th class="text-right font-semibold pb-2 px-2 uppercase tracking-wider text-[9.5px] text-slate-500">${p}</th>`).join('')}
+    </tr></thead><tbody>
+    ${rows.map(([cur, mandate, vals, hl]) => `
+      <tr class="${hl ? 'bg-emerald-50/40' : ''}">
+        <td class="py-1 px-2 text-[9.5px] uppercase tracking-wider font-semibold text-slate-500">${cur}</td>
+        <td class="py-1 px-2 text-[11px] ${hl ? 'font-semibold' : ''}">${mandate}${hl ? ' ←' : ''}</td>
+        ${vals.map(v => `<td class="text-right px-2 py-1 hm" style="${cellColor(v)}">${v.toFixed(2)}</td>`).join('')}
+      </tr>
+    `).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+function growthChartSVG() {
+  // Two area paths: status quo (lower curve) and with-recs (upper curve)
+  const pts = (a) => a.map((y, i) => `${(i / (a.length-1)) * 100} ${100 - y}`).join(' L ');
+  const recs = [10, 16, 22, 30, 38, 50, 60, 70, 78, 87, 94, 98];
+  const sq   = [10, 12, 14, 17, 20, 24, 28, 32, 36, 41, 46, 50];
+  const recsPath = `M 0 ${100-recs[0]} L ${pts(recs)} L 100 100 L 0 100 Z`;
+  const sqPath   = `M 0 ${100-sq[0]} L ${pts(sq)} L 100 100 L 0 100 Z`;
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-44 border border-slate-200 rounded overflow-visible">
+    <defs>
+      <linearGradient id="recs-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d9488" stop-opacity="0.45"/><stop offset="100%" stop-color="#0d9488" stop-opacity="0.04"/></linearGradient>
+      <linearGradient id="sq-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.25"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.04"/></linearGradient>
+    </defs>
+    <path d="${sqPath}" fill="url(#sq-grad)" />
+    <path d="${recsPath}" fill="url(#recs-grad)" />
+    <path d="M 0 ${100-sq[0]} L ${pts(sq)}" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="2 1" fill="none" />
+    <path d="M 0 ${100-recs[0]} L ${pts(recs)}" stroke="#0d9488" stroke-width="1.1" fill="none" />
+    <!-- Milestone dots -->
+    <circle cx="38" cy="${100-recs[5]}" r="1.2" fill="#b45309"/>
+    <text x="40" y="${100-recs[5]+2}" font-size="3" fill="#b45309" font-family="JetBrains Mono">EOSB · age 50</text>
+    <circle cx="100" cy="${100-recs[recs.length-1]}" r="1.2" fill="#0d9488"/>
+    <text x="78" y="${100-recs[recs.length-1]-3}" font-size="3" fill="#0d9488" font-family="JetBrains Mono">£2.95M · 58</text>
+  </svg>
+  <div class="flex items-center gap-4 mt-3 text-[10px]">
+    <div class="flex items-center gap-1.5"><div class="w-3 h-2" style="background:#0d9488"></div>With recommended plan</div>
+    <div class="flex items-center gap-1.5"><div class="w-3 h-0.5 border-t border-dashed border-slate-400"></div>Status quo trajectory</div>
+  </div>`;
+}
+
+/* =================== DEMO RUNTIME =================== */
+
+function renderAgents(progress) {
+  const list = document.getElementById('agentList');
+  list.innerHTML = AGENTS.map(a => {
+    const p = progress[a.id] || { state: 'idle', progress: 0 };
+    const cls = p.state === 'running' ? 'border-amber-300/30'
+              : p.state === 'done' ? 'border-emerald-400/30'
+              : 'border-white/[0.06]';
+    const iconCls = p.state === 'done' ? 'text-emerald-300' : p.state === 'running' ? 'text-amber-200' : 'text-white/35';
+    const status = p.state === 'idle' ? '—' : p.state === 'done' ? '✓' : (Math.round(p.progress) + '%');
+    const bar = p.state === 'done' ? 'bg-emerald-400' : 'bg-amber-300';
+    return `
+      <div class="agent-card border ${cls} rounded-md px-3 py-2.5 bg-white/[0.02]">
+        <div class="flex items-center gap-2.5">
+          <div class="${iconCls}">${a.icon}</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[12px] font-semibold text-white truncate leading-tight">${a.label}</div>
+            <div class="text-[10px] text-white/45 mt-0.5">${a.sub}</div>
+          </div>
+          <div class="shrink-0 text-[10px] font-mono num text-white/45 w-8 text-right">${status}</div>
+        </div>
+        <div class="mt-2 h-[2px] bg-white/[0.06] overflow-hidden rounded-sm">
+          <div class="h-full ${bar}" style="width:${p.progress}%; transition: width 200ms cubic-bezier(0.23, 1, 0.32, 1)"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPageTabs(activeN, completed) {
+  const tabs = document.getElementById('pageTabs');
+  tabs.innerHTML = PAGES.map(p => {
+    const isActive = p.n === activeN;
+    const isDone = completed.includes(p.n);
+    const cls = isActive
+      ? 'bg-slate-900 text-white'
+      : isDone
+      ? 'text-slate-700 hover:bg-slate-100 cursor-pointer'
+      : 'text-slate-300 cursor-default';
+    return `<button data-page="${p.n}" class="page-tab shrink-0 rounded text-[10px] font-medium px-2 py-1 ${cls}" style="transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1)">
+      <span class="num text-[9px] opacity-60 mr-0.5">${String(p.n).padStart(2,'0')}</span>${p.label}
+    </button>`;
+  }).join('');
+  document.querySelectorAll('.page-tab').forEach(btn => {
+    const n = parseInt(btn.dataset.page);
+    if (completed.includes(n)) {
+      btn.addEventListener('click', () => showPage(n, completed));
+    }
+  });
+  if (activeN !== null) {
+    const activeEl = tabs.querySelector(`[data-page="${activeN}"]`);
+    if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+function showPage(n, completed) {
+  const page = PAGES.find(p => p.n === n);
+  if (!page) return;
+  const body = document.getElementById('reportBody');
+  body.innerHTML = `<div class="page-enter">${page.render()}</div>`;
+  requestAnimationFrame(() => {
+    const el = body.querySelector('.page-enter');
+    if (el) el.classList.add('page-enter-active');
+  });
+  document.getElementById('pageCounter').textContent = `${String(n).padStart(2,'0')} / 47`;
+  renderPageTabs(n, completed);
+}
+
+let demoRunning = false;
+let demoPaused = false;
+let elapsedTicker = null;
+let progress = idleProgress();
+// Pause/resume state
+let activeIntervals = [];
+let pendingTimeouts = [];      // { id, fireAt, callback }
+let demoStartTs = 0;
+let pausedAtMs = 0;             // ms elapsed when paused
+let elapsedStartTs = 0;          // anchor for elapsed display
+
+renderAgents(progress);
+renderPageTabs(null, []);
+
+function idleProgress() { return AGENTS.reduce((acc, a) => ({ ...acc, [a.id]: { state: 'idle', progress: 0 } }), {}); }
+
+function setRunBtn(running, done) {
+  const btn = document.getElementById('runDemo');
+  btn.disabled = running;
+  document.getElementById('runLabel').textContent = running ? 'Building…' : (done ? 'Run again' : 'Run demo');
+  document.getElementById('playIcon').innerHTML = running
+    ? '<svg class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'
+    : '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 21 12 6 21 6 3"/></svg>';
+  // Pause button visibility
+  const pauseBtn = document.getElementById('pauseDemo');
+  if (running) {
+    pauseBtn.classList.remove('hidden');
+    pauseBtn.classList.add('inline-flex');
+    setPauseLabel(false);
+  } else {
+    pauseBtn.classList.add('hidden');
+    pauseBtn.classList.remove('inline-flex');
+  }
+}
+
+function setPauseLabel(paused) {
+  document.getElementById('pauseLabel').textContent = paused ? 'Resume' : 'Pause';
+  document.getElementById('pauseIcon').innerHTML = paused
+    ? '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 21 12 6 21 6 3"/></svg>'
+    : '<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+}
+
+function pauseDemo() {
+  if (!demoRunning || demoPaused) return;
+  demoPaused = true;
+  pausedAtMs = Date.now() - demoStartTs;
+  // Clear active intervals (agent progress)
+  activeIntervals.forEach(clearInterval);
+  activeIntervals = [];
+  // Clear future timeouts but record what's left
+  pendingTimeouts.forEach(t => {
+    if (t.fireAt > Date.now()) {
+      t.remaining = t.fireAt - Date.now();
+      clearTimeout(t.id);
+    } else {
+      t.remaining = 0;
+    }
+  });
+  // Stop elapsed ticker
+  if (elapsedTicker) { clearInterval(elapsedTicker); elapsedTicker = null; }
+  setPauseLabel(true);
+}
+
+function resumeDemo() {
+  if (!demoRunning || !demoPaused) return;
+  demoPaused = false;
+  demoStartTs = Date.now() - pausedAtMs;
+  elapsedStartTs = demoStartTs;
+  // Re-arm remaining timeouts
+  pendingTimeouts = pendingTimeouts
+    .filter(t => t.remaining > 0)
+    .map(t => {
+      const newId = setTimeout(t.callback, t.remaining);
+      return { id: newId, fireAt: Date.now() + t.remaining, callback: t.callback, remaining: 0 };
+    });
+  // Resume running agents
+  Object.entries(progress).forEach(([id, p]) => {
+    if (p.state === 'running') {
+      const agent = AGENTS.find(a => a.id === id);
+      if (!agent) return;
+      const iv = setInterval(() => {
+        if (demoPaused) return;
+        const next = Math.min(100, (progress[id].progress || 0) + agent.speed);
+        progress[id] = { state: next >= 100 ? 'done' : 'running', progress: next };
+        renderAgents(progress);
+        if (next >= 100) clearInterval(iv);
+      }, 100);
+      activeIntervals.push(iv);
+    }
+  });
+  // Resume elapsed ticker
+  resumeElapsedTicker();
+  setPauseLabel(false);
+}
+
+function togglePause() {
+  if (demoPaused) resumeDemo(); else pauseDemo();
+}
+
+function resumeElapsedTicker() {
+  const el = document.getElementById('elapsedTicker');
+  if (elapsedTicker) clearInterval(elapsedTicker);
+  elapsedTicker = setInterval(() => {
+    if (demoPaused) return;
+    const s = (Date.now() - demoStartTs) / 1000;
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = Math.floor(s % 60).toString().padStart(2, '0');
+    el.textContent = `${m}:${sec}`;
+  }, 100);
+}
+
+function stopElapsedTicker() { if (elapsedTicker) { clearInterval(elapsedTicker); elapsedTicker = null; } }
+
+// Wrap setTimeout so pause/resume can find pending timers
+function scheduleTimeout(callback, delay) {
+  const fireAt = Date.now() + delay;
+  const id = setTimeout(callback, delay);
+  pendingTimeouts.push({ id, fireAt, callback, remaining: 0 });
+  return id;
+}
+
+function runDemo() {
+  if (demoRunning) return;
+  demoRunning = true;
+  demoPaused = false;
+  progress = idleProgress();
+  activeIntervals = [];
+  pendingTimeouts = [];
+  renderAgents(progress);
+  document.getElementById('reportIdle').classList.add('hidden');
+  const body = document.getElementById('reportBody');
+  body.classList.remove('hidden');
+  body.innerHTML = '<div class="grid place-items-center w-full" style="min-height: 720px"><div class="text-center"><div class="text-[10px] text-slate-400 uppercase tracking-[0.18em] mb-2">Agents working</div><div class="text-sm text-slate-500 italic">Building bespoke assessment in your template…</div></div></div>';
+  document.getElementById('completeBanner').classList.add('hidden');
+  document.getElementById('docMeta').classList.remove('opacity-0');
+  renderPageTabs(null, []);
+  document.getElementById('pageCounter').textContent = '— / 47';
+  document.getElementById('pagesBuiltCount').textContent = '0';
+  setRunBtn(true, false);
+
+  demoStartTs = Date.now();
+  resumeElapsedTicker();
+
+  const completed = [];
+
+  AGENTS.forEach(a => {
+    scheduleTimeout(() => {
+      if (demoPaused) return;
+      progress[a.id] = { state: 'running', progress: 0 };
+      renderAgents(progress);
+      const iv = setInterval(() => {
+        if (demoPaused) return;
+        const p = Math.min(100, (progress[a.id].progress || 0) + a.speed);
+        progress[a.id] = { state: p >= 100 ? 'done' : 'running', progress: p };
+        renderAgents(progress);
+        if (p >= 100) clearInterval(iv);
+      }, 100);
+      activeIntervals.push(iv);
+    }, a.startMs);
+  });
+
+  let pagesShown = 0;
+  PAGES.forEach((page) => {
+    scheduleTimeout(() => {
+      if (demoPaused) return;
+      completed.push(page.n);
+      pagesShown++;
+      const implied = Math.min(47, Math.round((pagesShown / PAGES.length) * 47));
+      document.getElementById('pagesBuiltCount').textContent = implied;
+      showPage(page.n, completed);
+    }, page.revealAt);
+  });
+
+  const completeAt = 14400;
+  scheduleTimeout(() => {
+    if (demoPaused) return;
+    stopElapsedTicker();
+    document.getElementById('elapsedTicker').textContent = '00:14';
+    document.getElementById('elapsed').textContent = '14.0';
+    document.getElementById('pagesBuiltCount').textContent = '47';
+    document.getElementById('completeBanner').classList.remove('hidden');
+    demoRunning = false;
+    setRunBtn(false, true);
+    activeIntervals.forEach(clearInterval);
+    activeIntervals = [];
+  }, completeAt);
+}
+
+document.getElementById('runDemo').addEventListener('click', runDemo);
+document.getElementById('pauseDemo').addEventListener('click', togglePause);
+
+/* ============== HERO PREVIEW — auto-cycling ============== */
+
+const HERO_SLIDES = [
+  {
+    page: 9,
+    pageLabel: 'page 09 / 47',
+    label: 'Section 09',
+    title: 'Retirement gap analysis',
+    body: `
+      <div class="space-y-2.5">
+        <div>
+          <div class="flex justify-between text-[9px] text-slate-500 mb-1"><span>Status quo at 58</span><span class="font-mono font-semibold">£1.49M</span></div>
+          <div class="h-2 bg-slate-100 rounded-sm overflow-hidden"><div class="h-full bg-rose-300" style="width: 50%; transition: width 700ms cubic-bezier(0.23,1,0.32,1)"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[9px] text-slate-500 mb-1"><span>Target wealth at 58</span><span class="font-mono font-semibold">£2.95M</span></div>
+          <div class="h-2 bg-slate-100 rounded-sm overflow-hidden"><div class="h-full" style="background: linear-gradient(90deg, #34d399, #0d9488); width: 100%; transition: width 700ms cubic-bezier(0.23,1,0.32,1)"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[9px] text-slate-500 mb-1"><span>With recommendations</span><span class="font-mono font-semibold text-emerald-700">£2.95M ✓</span></div>
+          <div class="h-2 bg-slate-100 rounded-sm overflow-hidden"><div class="h-full bg-emerald-500" style="width: 100%; transition: width 700ms cubic-bezier(0.23,1,0.32,1)"></div></div>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-1">
+        <div><div class="text-[8px] uppercase tracking-wider text-slate-400 font-semibold">Gap</div><div class="text-[13px] font-semibold text-slate-900 font-mono">£1.46M</div></div>
+        <div><div class="text-[8px] uppercase tracking-wider text-slate-400 font-semibold">Monthly</div><div class="text-[13px] font-semibold text-slate-900 font-mono">£8,420</div></div>
+        <div><div class="text-[8px] uppercase tracking-wider text-slate-400 font-semibold">Projected</div><div class="text-[13px] font-semibold text-emerald-700 font-mono">£2.95M</div></div>
+      </div>`,
+  },
+  {
+    page: 26,
+    pageLabel: 'page 26 / 47',
+    label: 'Section 26',
+    title: 'Risk weighted mandates',
+    body: `
+      <div class="flex items-end gap-2 h-32 mb-2">
+        ${[
+          { name: 'Defensive',   eq: 33, fi: 62, cash: 5,  hl: false },
+          { name: 'Cautious',    eq: 47, fi: 48, cash: 5,  hl: false },
+          { name: 'Balanced',    eq: 61, fi: 34, cash: 5,  hl: false },
+          { name: 'Growth',      eq: 76, fi: 19, cash: 5,  hl: true },
+          { name: 'Adventurous', eq: 83, fi: 12, cash: 5,  hl: false },
+        ].map(p => `
+          <div class="flex-1 flex flex-col items-center">
+            <div class="w-full rounded-t overflow-hidden flex flex-col-reverse h-28 ${p.hl ? 'ring-2 ring-emerald-500 ring-offset-1' : ''}">
+              <div style="height: ${p.cash}%; background: #cbd5e1"></div>
+              <div style="height: ${p.fi}%; background: #475569"></div>
+              <div style="height: ${p.eq}%; background: #0d9488"></div>
+            </div>
+            <div class="mt-1 text-[8px] uppercase tracking-wider text-slate-600 font-semibold">${p.name}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="flex gap-3 text-[8.5px] text-slate-600">
+        <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-sm" style="background:#0d9488"></span>Equity</div>
+        <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-sm" style="background:#475569"></span>Fixed Income</div>
+        <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-sm" style="background:#cbd5e1"></span>Cash</div>
+      </div>
+      <div class="mt-3 text-[9px] text-slate-500 italic">Recommended: Growth (60/40 blend with Balanced)</div>`,
+  },
+  {
+    page: 17,
+    pageLabel: 'page 17 / 47',
+    label: 'Section 17',
+    title: 'Wealth projection · age 45 to 58',
+    body: `
+      <svg viewBox="0 0 100 60" preserveAspectRatio="none" class="w-full h-32 mb-2">
+        <defs>
+          <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0d9488" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#0d9488" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <path d="M 0 55 L 10 52 L 20 48 L 30 42 L 40 36 L 50 26 L 50 18 L 60 16 L 70 12 L 80 8 L 90 5 L 100 3 L 100 60 L 0 60 Z" fill="url(#hg)"/>
+        <path d="M 0 55 L 10 52 L 20 48 L 30 42 L 40 36 L 50 26 L 50 18 L 60 16 L 70 12 L 80 8 L 90 5 L 100 3" stroke="#0d9488" stroke-width="0.8" fill="none"/>
+        <circle cx="50" cy="22" r="1.2" fill="#b45309"/>
+        <circle cx="100" cy="3" r="1.2" fill="#0d9488"/>
+      </svg>
+      <div class="grid grid-cols-4 gap-1.5">
+        <div><div class="text-[7.5px] uppercase tracking-wider text-slate-400 font-semibold">Age 45</div><div class="text-[11px] font-semibold text-slate-900 font-mono">£188k</div></div>
+        <div><div class="text-[7.5px] uppercase tracking-wider text-slate-400 font-semibold">Age 50</div><div class="text-[11px] font-semibold text-slate-900 font-mono">£1.04M</div></div>
+        <div><div class="text-[7.5px] uppercase tracking-wider text-slate-400 font-semibold">Age 55</div><div class="text-[11px] font-semibold text-slate-900 font-mono">£2.16M</div></div>
+        <div><div class="text-[7.5px] uppercase tracking-wider text-slate-400 font-semibold">Age 58</div><div class="text-[11px] font-semibold text-emerald-700 font-mono">£2.95M</div></div>
+      </div>`,
+  },
+  {
+    page: 11,
+    pageLabel: 'page 11 / 47',
+    label: 'Section 11',
+    title: 'UK income tax · band breakdown',
+    body: `
+      <div class="rounded overflow-hidden flex h-10 mb-3">
+        <div class="flex items-center justify-center text-white text-[8.5px] font-semibold" style="width: 13.7%; background: #14b8a6">£12,570</div>
+        <div class="flex items-center justify-center text-white text-[8.5px] font-semibold" style="width: 41.2%; background: #0d9488">20%</div>
+        <div class="flex items-center justify-center text-white text-[8.5px] font-semibold" style="width: 32.8%; background: #0f766e">40%</div>
+        <div class="flex items-center justify-center text-white text-[8.5px] font-semibold" style="width: 12.3%; background: #064e3b">45%</div>
+      </div>
+      <div class="text-[9px] text-slate-500 flex justify-between mb-3"><span>£0</span><span class="font-mono">£91,470 gross</span></div>
+      <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+        <div><div class="text-[8px] uppercase tracking-wider text-slate-400 font-semibold">Annual tax (today)</div><div class="text-[14px] font-semibold text-slate-900 font-mono">£16,470</div></div>
+        <div><div class="text-[8px] uppercase tracking-wider text-slate-400 font-semibold">At retirement 2039</div><div class="text-[14px] font-semibold text-slate-900 font-mono">£24,210</div></div>
+      </div>`,
+  },
+];
+
+let heroCurrentSlide = 0;
+let heroTimer = null;
+
+function renderHeroDots() {
+  const dots = document.getElementById('heroDots');
+  if (!dots) return;
+  dots.innerHTML = HERO_SLIDES.map((_, i) => `
+    <button data-slide="${i}" class="w-1.5 h-1.5 rounded-full transition-all duration-200 ${i === heroCurrentSlide ? 'bg-emerald-500 w-4' : 'bg-slate-300'}"></button>
+  `).join('');
+  dots.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      heroCurrentSlide = parseInt(b.dataset.slide);
+      renderHeroSlide();
+      // restart timer
+      if (heroTimer) clearInterval(heroTimer);
+      heroTimer = setInterval(advanceHero, 4500);
+    });
+  });
+}
+
+function renderHeroSlide() {
+  const slide = HERO_SLIDES[heroCurrentSlide];
+  const body = document.getElementById('heroPreviewBody');
+  const pill = document.getElementById('heroPagePill');
+  if (!body || !slide) return;
+
+  pill.textContent = slide.pageLabel;
+
+  body.innerHTML = `
+    <div class="px-4 py-4 transition-opacity duration-300" style="opacity: 0;" id="heroSlideInner">
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-[8px] font-semibold tracking-[0.18em] uppercase text-slate-600">Bespoke Wealth Assessment</div>
+        <div class="text-[8px] text-slate-400 font-mono">${slide.pageLabel.replace('page ', '')}</div>
+      </div>
+      <div class="border-b border-slate-200 pb-2 mb-3">
+        <div class="text-[9px] uppercase tracking-[0.18em] text-emerald-700/80 font-semibold">${slide.label}</div>
+        <div class="text-[14px] font-semibold mt-0.5 text-slate-900 font-display">${slide.title}</div>
+      </div>
+      ${slide.body}
+    </div>
+  `;
+  requestAnimationFrame(() => {
+    const inner = document.getElementById('heroSlideInner');
+    if (inner) inner.style.opacity = '1';
+  });
+  renderHeroDots();
+}
+
+function advanceHero() {
+  heroCurrentSlide = (heroCurrentSlide + 1) % HERO_SLIDES.length;
+  renderHeroSlide();
+}
+
+renderHeroSlide();
+heroTimer = setInterval(advanceHero, 4500);
+
+/* ============== Scroll reveal observer ============== */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('section').forEach(s => revealObserver.observe(s));
+
+/* ============== SCROLL-DRIVEN ANIMATIONS ============== */
+
+(function scrollEngine() {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) return;
+
+  /* ---- A. Number counters that animate when scrolled into view ---- */
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseFloat(el.dataset.count);
+      const duration = parseInt(el.dataset.duration) || 1400;
+      const suffix = el.dataset.suffix || '';
+      const prefix = el.dataset.prefix || '';
+      const decimals = parseInt(el.dataset.decimals) || 0;
+      const startTime = performance.now();
+      el.classList.add('counting');
+      function tick(now) {
+        const elapsed = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - elapsed, 3);
+        const value = target * eased;
+        el.firstChild ? el.firstChild.textContent = prefix + value.toFixed(decimals) + suffix : el.textContent = prefix + value.toFixed(decimals) + suffix;
+        if (elapsed < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          // Restore inner HTML if present (e.g. % span)
+          if (el.dataset.html) el.innerHTML = el.dataset.html;
+          el.classList.remove('counting');
+        }
+      }
+      requestAnimationFrame(tick);
+      countObserver.unobserve(el);
+    });
+  }, { threshold: 0.45 });
+  document.querySelectorAll('[data-count]').forEach(el => {
+    if (el.innerHTML.trim()) el.dataset.html = el.innerHTML;
+    countObserver.observe(el);
+  });
+
+  /* ---- B. Scroll-driven parallax (hero preview + bg layers) ---- */
+  let ticking = false;
+  const heroPreview = document.getElementById('heroPreview');
+  const parallaxEls = Array.from(document.querySelectorAll('[data-parallax]'));
+
+  function updateScroll() {
+    const scrollY = window.scrollY;
+    const vh = window.innerHeight;
+
+    if (heroPreview) {
+      // Only apply while hero is roughly in view
+      const rect = heroPreview.getBoundingClientRect();
+      if (rect.bottom > -100 && rect.top < vh + 100) {
+        // Subtle drift + tilt as user scrolls past
+        const progress = Math.max(0, Math.min(1, scrollY / (vh * 0.8)));
+        const ty = -progress * 24;
+        const rot = progress * -1.6;
+        const sc = 1 - progress * 0.04;
+        heroPreview.style.transform = `translateY(${ty}px) rotate(${rot}deg) scale(${sc})`;
+      }
+    }
+
+    parallaxEls.forEach(el => {
+      const speed = parseFloat(el.dataset.parallax) || 0.3;
+      el.style.transform = `translate3d(0, ${scrollY * speed}px, 0)`;
+    });
+
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(updateScroll);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  updateScroll();
+
+  /* ---- C. Workflow step active highlighting on scroll ---- */
+  const workflowSteps = document.querySelectorAll('[data-workflow-step]');
+  if (workflowSteps.length) {
+    const stepObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Stagger the activation by index for cascading light-up
+          const idx = parseInt(entry.target.dataset.stepIndex || 0);
+          setTimeout(() => entry.target.classList.add('step-active'), idx * 120);
+        }
+      });
+    }, { threshold: 0.35, rootMargin: '0px 0px -10% 0px' });
+    workflowSteps.forEach((s, i) => {
+      s.dataset.stepIndex = i;
+      stepObs.observe(s);
+    });
+  }
+
+  /* ---- D. Pause hero auto-cycle when user hovers preview ---- */
+  if (heroPreview) {
+    heroPreview.addEventListener('mouseenter', () => {
+      if (heroTimer) clearInterval(heroTimer);
+      heroTimer = null;
+    });
+    heroPreview.addEventListener('mouseleave', () => {
+      if (!heroTimer) heroTimer = setInterval(advanceHero, 4500);
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>
