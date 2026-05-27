@@ -2300,6 +2300,13 @@ function growthChartSVG() {
 
 /* =================== DEMO RUNTIME =================== */
 
+console.log('[advisens] prototype script starting');
+console.log('[advisens] AGENTS:', typeof AGENTS, Array.isArray(AGENTS) ? AGENTS.length : 'n/a');
+console.log('[advisens] PAGES:', typeof PAGES, Array.isArray(PAGES) ? PAGES.length : 'n/a');
+console.log('[advisens] HERO_SLIDES:', typeof HERO_SLIDES, Array.isArray(HERO_SLIDES) ? HERO_SLIDES.length : 'n/a');
+console.log('[advisens] document.getElementById("runDemo"):', document.getElementById('runDemo'));
+console.log('[advisens] document.getElementById("agentList"):', document.getElementById('agentList'));
+
 function renderAgents(progress) {
   const list = document.getElementById('agentList');
   list.innerHTML = AGENTS.map(a => {
@@ -2555,8 +2562,12 @@ function runDemo() {
   }, completeAt);
 }
 
-document.getElementById('runDemo').addEventListener('click', runDemo);
-document.getElementById('pauseDemo').addEventListener('click', togglePause);
+const _runBtn = document.getElementById('runDemo');
+const _pauseBtn = document.getElementById('pauseDemo');
+console.log('[advisens] attaching listeners. runBtn:', _runBtn, 'pauseBtn:', _pauseBtn);
+if (_runBtn) _runBtn.addEventListener('click', () => { console.log('[advisens] run clicked'); runDemo(); });
+if (_pauseBtn) _pauseBtn.addEventListener('click', () => { console.log('[advisens] pause clicked'); togglePause(); });
+console.log('[advisens] listeners attached');
 
 /* ============== HERO PREVIEW — auto-cycling ============== */
 
