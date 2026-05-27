@@ -1,60 +1,52 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import { readFileSync } from "fs";
+import { join } from "path";
+import PlatformClient from "./PlatformClient";
 
 /**
- * Platform page — Advisens prototype.
+ * Server Component: reads the prototype HTML at build time and hands the
+ * extracted body markup, head content, and script source to a Client
+ * Component that mounts it natively (no iframe).
  *
- * The prototype is served as a static HTML file at /prototype.html so it
- * deploys instantly to Vercel without porting all 2800 lines to React.
- *
- * Next iteration: progressively replace iframe sections with native JSX
- * components so external editors (21st.dev Magic MCP, v0.dev, Vercel toolbar)
- * can edit them directly.
+ * Why this pattern:
+ *   - Eliminates iframe (Vercel toolbar, dev tools, anchor navigation,
+ *     scroll position all behave normally inside the React tree).
+ *   - Keeps the prototype as a single HTML file we can iterate on without
+ *     rewriting JSX.
+ *   - Lets us progressively extract sections to native JSX components when
+ *     we want to drop in 21st.dev / v0 / shadcn pieces.
  */
 export default function PlatformPage() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [loaded, setLoaded] = useState(false);
+  const html = readFileSync(
+    join(process.cwd(), "public/prototype.html"),
+    "utf-8",
+  );
 
-  useEffect(() => {
-    // Trigger fade-in when iframe content loads
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    const onLoad = () => setLoaded(true);
-    iframe.addEventListener("load", onLoad);
-    return () => iframe.removeEventListener("load", onLoad);
-  }, []);
+  // Extract body inner content
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  const rawBody = bodyMatch ? bodyMatch[1] : "";
+
+  // Extract head content (link/style/preconnect tags)
+  const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  const rawHead = headMatch ? headMatch[1] : "";
+
+  // Strip <title>, <meta charset>, and viewport (handled by Next.js layout)
+  const cleanedHead = rawHead
+    .replace(/<title[\s\S]*?<\/title>/gi, "")
+    .replace(/<meta[^>]*charset[^>]*>/gi, "")
+    .replace(/<meta[^>]*name=["']viewport[^>]*>/gi, "");
+
+  // Pull all <script> contents out of the body so we can run them after mount
+  const scriptMatches = [...rawBody.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)];
+  const scriptSource = scriptMatches.map((m) => m[1]).join("\n\n");
+
+  // Body markup without <script> tags
+  const bodyWithoutScripts = rawBody.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
 
   return (
-    <main className="min-h-screen bg-[#0a0e16]">
-      {/* Skip link for accessibility */}
-      <a
-        href="#prototype-frame"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-2 focus:rounded"
-      >
-        Skip to prototype
-      </a>
-
-      {/* Loading state */}
-      {!loaded && (
-        <div className="fixed inset-0 grid place-items-center bg-[#0a0e16] z-10">
-          <div className="text-center">
-            <div className="inline-block h-6 w-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-3" />
-            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-              Loading prototype
-            </div>
-          </div>
-        </div>
-      )}
-
-      <iframe
-        ref={iframeRef}
-        id="prototype-frame"
-        src="/prototype.html"
-        title="Advisens prototype"
-        className="w-full h-screen border-0 block"
-        style={{ minHeight: "100vh" }}
-      />
-    </main>
+    <PlatformClient
+      headContent={cleanedHead}
+      bodyContent={bodyWithoutScripts}
+      scriptSource={scriptSource}
+    />
   );
 }
