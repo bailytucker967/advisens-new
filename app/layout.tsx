@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Clean UI / body sans
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -13,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Advisens — Report intelligence for GCC & international financial advisers",
+  title: "TWI Report Generator · Titan Wealth International",
   description:
-    "Advisens learns the structure, language, and product universe of your existing reports. Every future client report is pre-populated, fact-checked, and ready to ship in minutes.",
+    "The in-house report engine for Titan Wealth advisers. Turn a client meeting into a finished, on-brand wealth report in minutes.",
 };
 
 export const viewport: Viewport = {
@@ -32,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="overflow-x-hidden">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden min-w-0`}
+        className={`${inter.variable} ${geistMono.variable} antialiased overflow-x-hidden min-w-0`}
       >
         {children}
       </body>

@@ -1,74 +1,101 @@
 @import "tailwindcss";
 
+/* ============================================================
+   TITAN WEALTH INTERNATIONAL — Brand theme · "Powering Ambitions"
+   Primary palette: purple + white. Secondary used sparingly.
+   Built from TW_Brand_Book_5.0. Heritage token NAMES are retained
+   as aliases (mapped to TWI values) so existing classes recolour
+   with no churn; new code should prefer the twi-* tokens.
+   ============================================================ */
+@theme {
+  /* — Dark surfaces (hero bands / header / footer) — Deep Purple — */
+  --color-espresso: #31135e;        /* Deep Purple — primary dark surface */
+  --color-espresso-800: #2a0f54;    /* deeper */
+  --color-espresso-700: #3d1d6e;    /* lifted */
+  --color-espresso-600: #4a2585;    /* more lifted */
+
+  /* — Light surfaces — Cloud White + faint purple tints — */
+  --color-cream: #faf8ff;           /* page background (white, faint purple cast) */
+  --color-cream-50: #ffffff;        /* cards — pure Cloud White, lifts off the page */
+  --color-cream-100: #f3effe;       /* tinted card / hover */
+  --color-parchment: #ece4fb;       /* light purple band */
+  --color-parchment-dark: #ddd0f5;
+
+  /* — Ink — purple-tinted neutrals — */
+  --color-mahogany: #1b1233;        /* primary ink */
+  --color-mahogany-700: #2e2150;    /* strong */
+  --color-mahogany-500: #6a5f86;    /* secondary text */
+  --color-mahogany-400: #998fb3;    /* tertiary / captions */
+
+  /* — Accent — Empowered Purple — */
+  --color-gold: #8a3ffc;            /* Empowered Purple — primary accent */
+  --color-gold-600: #6f25d8;        /* deeper — small accent text on white */
+  --color-gold-bright: #9a5bff;     /* hover */
+  --color-gold-soft: #c4a3ff;       /* soft */
+
+  /* — Support — */
+  --color-oxblood: #c0392b;         /* error */
+  --color-sage: #15b8a0;            /* positive (teal-leaning) */
+
+  /* — TWI named palette (prefer these in new code) — */
+  --color-twi-deep: #31135e;        /* Deep Purple */
+  --color-twi-purple: #8a3ffc;      /* Empowered Purple */
+  --color-twi-white: #ffffff;       /* Cloud White */
+  --color-twi-carbon: #0a0a0d;      /* Carbon Black (neutral) */
+  --color-twi-blue: #0f62fe;        /* Imagination Blue (secondary) */
+  --color-twi-orange: #ff832b;      /* Creative Orange (secondary) */
+  --color-twi-teal: #58f9ca;        /* Clarity Teal (secondary) */
+
+  /* — Fonts — Inter throughout (brand secondary face; primary Roobert is licensed) — */
+  --font-display: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* — Shadows — neutral, with an Empowered Purple glow — */
+  --shadow-warm-sm: 0 1px 2px rgba(20, 12, 40, 0.06), 0 2px 6px rgba(20, 12, 40, 0.05);
+  --shadow-warm: 0 4px 12px rgba(20, 12, 40, 0.08), 0 12px 32px rgba(20, 12, 40, 0.07);
+  --shadow-warm-lg: 0 12px 32px rgba(20, 12, 40, 0.12), 0 32px 64px rgba(20, 12, 40, 0.1);
+  --shadow-gold: 0 8px 28px rgba(138, 63, 252, 0.3);
+}
+
 /* ── Base ────────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
-
-
-/* ── Existing animations ─────────────────────────────────────── */
-@keyframes floaty {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
+body {
+  background-color: var(--color-cream);
+  color: var(--color-mahogany);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-@keyframes shimmer {
-  0%   { transform: translateX(-100%) rotate(12deg); }
-  100% { transform: translateX(200%) rotate(12deg); }
+/* Headings use the brand sans (Inter), tightened */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.018em;
 }
 
-@keyframes mobile-menu-slide {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+::selection {
+  background-color: var(--color-gold);
+  color: #ffffff;
 }
 
-@keyframes mobile-menu-backdrop {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* ── Paper grain — removed (TWI is clean / digital-first) ─────── */
+.paper-grain {
+  background-image: none;
 }
 
-/* ── Aurora background blobs ─────────────────────────────────── */
-/* IMPORTANT: scale() + blur = GPU recomposite every frame → lag  */
-/* All aurora keyframes use translate3d only for compositor perf   */
-@keyframes aurora-1 {
-  0%, 100% { transform: translate3d(0,    0,    0); }
-  25%       { transform: translate3d(50px, -60px, 0); }
-  50%       { transform: translate3d(-30px, 50px, 0); }
-  75%       { transform: translate3d(60px,  30px, 0); }
-}
-@keyframes aurora-2 {
-  0%, 100% { transform: translate3d(0,     0,    0); }
-  30%       { transform: translate3d(-55px, 40px, 0); }
-  60%       { transform: translate3d(40px, -50px, 0); }
-}
-@keyframes aurora-3 {
-  0%, 100% { transform: translate3d(0,    0,     0); }
-  40%       { transform: translate3d(35px, 60px,  0); }
-  70%       { transform: translate3d(-45px,-30px, 0); }
-}
-@keyframes aurora-4 {
-  0%, 100% { transform: translate3d(0,     0,     0); }
-  33%       { transform: translate3d(-40px,-55px, 0); }
-  66%       { transform: translate3d(55px,  25px, 0); }
-}
-@keyframes aurora-5 {
-  0%, 100% { transform: translate3d(0,     0,    0); }
-  50%       { transform: translate3d(-60px,-40px, 0); }
+/* ── Brand gradient text (Empowered Purple) ──────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #8a3ffc 0%, #b388ff 60%, #c4a3ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* ── Marquee ticker ──────────────────────────────────────────── */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 35s linear infinite;
-}
-.marquee-track:hover {
-  animation-play-state: paused;
-}
+/* ── Hairline borders ────────────────────────────────────────── */
+.hairline-dark { border-color: rgba(255, 255, 255, 0.12); }
+.hairline-light { border-color: rgba(27, 18, 51, 0.12); }
 
 /* ── Scroll reveal ───────────────────────────────────────────── */
 .reveal {
@@ -81,24 +108,16 @@ html {
   opacity: 1;
   transform: translateY(0);
 }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+.reveal-delay-5 { transition-delay: 0.4s; }
 
 /* ── Hero text reveal ────────────────────────────────────────── */
 @keyframes text-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0px);
-  }
+  from { opacity: 0; transform: translateY(28px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 .text-reveal {
   opacity: 0;
@@ -110,16 +129,75 @@ html {
 .text-reveal-4 { animation-delay: 0.64s; }
 .text-reveal-5 { animation-delay: 0.82s; }
 
-/* ── 3D tilt ─────────────────────────────────────────────────── */
-.tilt-card {
-  transform-style: preserve-3d;
+/* ── Floating ───────────────────────────────────────────────── */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.animate-floaty { animation: floaty 6s ease-in-out infinite; }
+
+/* ── Report page reveal (live demo) ─────────────────────────── */
+@keyframes report-page-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.992); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.report-page-in {
+  animation: report-page-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes pulse-ring {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
 }
 
-/* ── Magnetic button ─────────────────────────────────────────── */
-.magnetic {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+/* ── Shimmer ────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { transform: translateX(-120%) rotate(8deg); }
+  100% { transform: translateX(220%) rotate(8deg); }
 }
 
+/* ── Marquee ────────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ── 3D tilt helpers ─────────────────────────────────────────── */
+.tilt-card { transform-style: preserve-3d; }
+.preserve-3d { transform-style: preserve-3d; }
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .text-reveal, .animate-floaty, .marquee-track {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Print: export the report surface only ───────────────────── */
+@media print {
+  body * { visibility: hidden !important; }
+  .report-print-surface,
+  .report-print-surface * { visibility: visible !important; }
+  .report-print-surface {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .report-print-surface > div {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
+}
 
 /* ── Utilities ───────────────────────────────────────────────── */
 @layer utilities {
@@ -127,7 +205,5 @@ html {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
